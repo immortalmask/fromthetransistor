@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "id": "lab-06-browser",
+  "module": "06.04",
+  "title": "Offline HTTP and Text Rendering",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "render-title-headline-and-paragraph",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.1 200 OK\r\nContent-Length: 96\r\nContent-Type: text/html\r\n\r\n<html><head><title>Demo</title></head><body><h1>Hello</h1><p>Bytes &amp; bits.</p></body></html>",
+      "expected_stdout": "status=200 OK\ntitle=Demo\nbody:\nHello\nBytes & bits.\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "preserve-non-success-status",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.0 404 Not Found\r\nContent-Length: 60\r\n\r\n<html><body><p>Not <strong>found</strong>.</p></body></html>",
+      "expected_stdout": "status=404 Not Found\ntitle=(none)\nbody:\nNot found.\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "normalize-whitespace-breaks-and-entities",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.1 200 OK\r\ncontent-length: 107\r\n\r\n<html><head><title>  Tiny   Web </title></head><body>one<br>two &lt; three<br/>four&nbsp;five</body></html>",
+      "expected_stdout": "status=200 OK\ntitle=Tiny Web\nbody:\none\ntwo < three\nfour five\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-lf-only-framing",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.1 200 OK\nContent-Length: 0\n\n",
+      "expected_stdout": "error: malformed HTTP framing (missing CRLF header terminator)\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-content-length-mismatch",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\ntest",
+      "expected_stdout": "error: Content-Length 5 does not match 4 body bytes\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-unsupported-tag",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.1 200 OK\r\nContent-Length: 44\r\n\r\n<html><body><script>x</script></body></html>",
+      "expected_stdout": "error: unsupported HTML tag <script>\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "http-10-case-insensitive-header-and-tags",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.0 204 No Content\r\ncontent-length: 26\r\nX-Test: ok\r\n\r\n<HTML><BODY></BODY></HTML>",
+      "expected_stdout": "status=204 No Content\ntitle=(none)\nbody:\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-duplicate-content-length-before-html",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.1 200 OK\r\nContent-Length: 13\r\ncontent-length: 13\r\n\r\n<body></body>",
+      "expected_stdout": "error: invalid or duplicate Content-Length header\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-unsupported-entity-without-partial-render",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.1 200 OK\r\nContent-Length: 21\r\n\r\n<body>A&copy;B</body>",
+      "expected_stdout": "error: unsupported or malformed HTML entity\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-unclosed-body-structure",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.1 200 OK\r\nContent-Length: 23\r\n\r\n<html><body>text</html>",
+      "expected_stdout": "error: unclosed or missing HTML title/body structure\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-unsupported-http-version",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/2.0 200 OK\r\nContent-Length: 13\r\n\r\n<body></body>",
+      "expected_stdout": "error: malformed HTTP status line\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-nul-byte-before-protocol-parsing",
+      "argv": ["{build}/program"],
+      "stdin": "HTTP/1.1 200 OK\r\nContent-Length: 16\r\n\r\n<body>A\u0000B</body>",
+      "expected_stdout": "error: HTTP response contains a NUL byte\n",
+      "expected_exit": 2,
+      "timeout": 3
+    }
+  ]
+}

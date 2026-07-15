@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "gate-06",
+  "questions": [
+    {
+      "prompt": "In a TCP receive stream, what does RCV.NXT identify?",
+      "choices": {
+        "A": "The highest byte observed anywhere",
+        "B": "The first sequence position not yet received contiguously",
+        "C": "The local process identifier",
+        "D": "The sender's maximum packet size"
+      },
+      "answer": "B",
+      "explanation": "Acknowledgments describe the next contiguous byte expected. Out-of-order higher bytes do not advance RCV.NXT until the gap is filled."
+    },
+    {
+      "prompt": "Which assumption is invalid for both TCP socket reads and incremental HTTP/HTML parsing?",
+      "choices": {
+        "A": "Input can be split at any byte boundary",
+        "B": "Parser state must survive between reads",
+        "C": "One read corresponds to one protocol message, header, or tag",
+        "D": "Resource limits must be checked while accumulating input"
+      },
+      "answer": "C",
+      "explanation": "TCP exposes an ordered byte stream without preserving application message boundaries. Every protocol delimiter and token may span reads or share one read with later data."
+    },
+    {
+      "prompt": "Why is the course Telnet server restricted to loopback?",
+      "choices": {
+        "A": "Telnet is encrypted but too fast for real networks",
+        "B": "Telnet provides no secure confidentiality or authentication and the service exposes a command session",
+        "C": "TCP cannot route beyond loopback",
+        "D": "Loopback automatically fixes descriptor leaks"
+      },
+      "answer": "B",
+      "explanation": "A Telnet-style remote shell is intentionally insecure. Loopback containment reduces exposure but does not replace correct session isolation and cleanup."
+    },
+    {
+      "prompt": "What should a dynamic loader do after applying relocations to an executable segment through a temporary writable mapping?",
+      "choices": {
+        "A": "Leave it writable and executable forever",
+        "B": "Apply final non-writable executable permissions before control transfer",
+        "C": "Delete all symbol definitions",
+        "D": "Copy the segment into the network stack"
+      },
+      "answer": "B",
+      "explanation": "Relocation may need a controlled write phase, but final permissions should enforce write xor execute. Bounds and relocation support are checked before writes."
+    },
+    {
+      "prompt": "How should a text browser handle an ESC byte supplied by document content in plain-text output mode?",
+      "choices": {
+        "A": "Pass it directly to the terminal",
+        "B": "Escape, replace, or reject it so content cannot inject terminal control sequences",
+        "C": "Interpret it as HTML closing tag",
+        "D": "Reconnect TCP and try again"
+      },
+      "answer": "B",
+      "explanation": "Terminal control bytes are an output trust boundary. Plain-text mode must make them inert rather than allowing a page to alter the terminal or deceive the learner."
+    }
+  ]
+}

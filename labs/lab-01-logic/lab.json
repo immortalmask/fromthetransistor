@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "id": "lab-01-logic",
+  "module": "01.01",
+  "title": "LUTs, Clocks, and State",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "and-lut",
+      "argv": ["{build}/program", "lut", "8"],
+      "stdin": "",
+      "expected_stdout": "a=0 b=0 y=0\na=0 b=1 y=0\na=1 b=0 y=0\na=1 b=1 y=1\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "xor-lut",
+      "argv": ["{build}/program", "lut", "6"],
+      "stdin": "",
+      "expected_stdout": "a=0 b=0 y=0\na=0 b=1 y=1\na=1 b=0 y=1\na=1 b=1 y=0\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "hex-or-lut",
+      "argv": ["{build}/program", "lut", "0xe"],
+      "stdin": "",
+      "expected_stdout": "a=0 b=0 y=0\na=0 b=1 y=1\na=1 b=0 y=1\na=1 b=1 y=1\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "two-bit-counter-wraps",
+      "argv": ["{build}/program", "counter", "2", "6"],
+      "stdin": "",
+      "expected_stdout": "cycle=0 q=0\ncycle=1 q=1\ncycle=2 q=2\ncycle=3 q=3\ncycle=4 q=0\ncycle=5 q=1\ncycle=6 q=2\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-zero-width",
+      "argv": ["{build}/program", "counter", "0", "3"],
+      "stdin": "",
+      "expected_stdout": "error: BITS must be an integer from 1 to 8\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "all-ones-lut-covers-every-address",
+      "argv": ["{build}/program", "lut", "15"],
+      "stdin": "",
+      "expected_stdout": "a=0 b=0 y=1\na=0 b=1 y=1\na=1 b=0 y=1\na=1 b=1 y=1\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "one-bit-counter-wraps-every-other-edge",
+      "argv": ["{build}/program", "counter", "1", "3"],
+      "stdin": "",
+      "expected_stdout": "cycle=0 q=0\ncycle=1 q=1\ncycle=2 q=0\ncycle=3 q=1\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reset-state-with-zero-clock-edges",
+      "argv": ["{build}/program", "counter", "8", "0"],
+      "stdin": "",
+      "expected_stdout": "cycle=0 q=0\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-mask-outside-four-bit-lut",
+      "argv": ["{build}/program", "lut", "16"],
+      "stdin": "",
+      "expected_stdout": "error: MASK must be an integer from 0 to 15\n",
+      "expected_exit": 2,
+      "timeout": 3
+    }
+  ]
+}

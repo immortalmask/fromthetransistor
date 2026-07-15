@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fromthetransistor-course"
+version = "0.2.0"
+description = "A runnable, software-first course from logic gates to a text web browser"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+notebooks = ["jupyterlab"]
+
+[project.scripts]
+ftt = "ftt.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]

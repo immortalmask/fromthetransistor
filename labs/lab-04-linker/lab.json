@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "lab-04-linker",
+  "module": "04.02",
+  "title": "Relocation Engine",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "absolute-with-addend",
+      "argv": ["{build}/program", "abs32", "0x1000", "0x2000", "4"],
+      "expected_stdout": "value=0x00002004 bytes=04 20 00 00\n"
+    },
+    {
+      "name": "forward-relative",
+      "argv": ["{build}/program", "rel32", "0x1000", "0x1010", "-4"],
+      "expected_stdout": "value=0x0000000c bytes=0c 00 00 00\n"
+    },
+    {
+      "name": "backward-relative",
+      "argv": ["{build}/program", "rel32", "0x2000", "0x1ff0", "0"],
+      "expected_stdout": "value=0xfffffff0 bytes=f0 ff ff ff\n"
+    },
+    {
+      "name": "modulo-wrap",
+      "argv": ["{build}/program", "abs32", "0", "0xffffffff", "1"],
+      "expected_stdout": "value=0x00000000 bytes=00 00 00 00\n"
+    },
+    {
+      "name": "reject-unknown-relocation",
+      "argv": ["{build}/program", "mystery", "0", "0", "0"],
+      "expected_stdout": "error: relocation must be abs32 or rel32\n",
+      "expected_exit": 2
+    },
+    {
+      "name": "absolute-negative-addend-wraps-modulo-32-bits",
+      "argv": ["{build}/program", "abs32", "0", "0", "-1"],
+      "expected_stdout": "value=0xffffffff bytes=ff ff ff ff\n"
+    },
+    {
+      "name": "relative-extreme-addend-and-place-wrap",
+      "argv": ["{build}/program", "rel32", "0xffffffff", "0", "-2147483648"],
+      "expected_stdout": "value=0x80000001 bytes=01 00 00 80\n"
+    },
+    {
+      "name": "serialization-reuses-little-endian-byte-contract",
+      "argv": ["{build}/program", "abs32", "0", "305419896", "0"],
+      "expected_stdout": "value=0x12345678 bytes=78 56 34 12\n"
+    },
+    {
+      "name": "reject-negative-unsigned-address",
+      "argv": ["{build}/program", "abs32", "-1", "0", "0"],
+      "expected_stdout": "error: malformed or out-of-range operand\n",
+      "expected_exit": 2
+    }
+  ]
+}

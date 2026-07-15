@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "id": "lab-05-pagewalk",
+  "module": "05.01",
+  "title": "Page Translation and Protection",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "read-present-page",
+      "argv": ["{build}/program", "read", "0x1234", "0xab01"],
+      "stdin": "",
+      "expected_stdout": "vpn=0x12 offset=0x34 ppn=0xab pa=0xab34 access=read\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "write-permitted",
+      "argv": ["{build}/program", "write", "0x00ff", "0x4203"],
+      "stdin": "",
+      "expected_stdout": "vpn=0x00 offset=0xff ppn=0x42 pa=0x42ff access=write\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "execute-permitted",
+      "argv": ["{build}/program", "execute", "65535", "0x7f05"],
+      "stdin": "",
+      "expected_stdout": "vpn=0xff offset=0xff ppn=0x7f pa=0x7fff access=execute\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "not-present-fault",
+      "argv": ["{build}/program", "read", "0x1234", "0xab00"],
+      "stdin": "",
+      "expected_stdout": "fault=not-present vpn=0x12\n",
+      "expected_exit": 3,
+      "timeout": 3
+    },
+    {
+      "name": "write-protection-fault",
+      "argv": ["{build}/program", "write", "0x1234", "0xab01"],
+      "stdin": "",
+      "expected_stdout": "fault=write-protection vpn=0x12\n",
+      "expected_exit": 3,
+      "timeout": 3
+    },
+    {
+      "name": "execute-protection-fault",
+      "argv": ["{build}/program", "execute", "0x1234", "0xab03"],
+      "stdin": "",
+      "expected_stdout": "fault=execute-protection vpn=0x12\n",
+      "expected_exit": 3,
+      "timeout": 3
+    },
+    {
+      "name": "zero-virtual-address-to-highest-physical-page",
+      "argv": ["{build}/program", "read", "0", "0xff07"],
+      "stdin": "",
+      "expected_stdout": "vpn=0x00 offset=0x00 ppn=0xff pa=0xff00 access=read\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "not-present-fault-has-permission-priority",
+      "argv": ["{build}/program", "write", "0x12fe", "0xab06"],
+      "stdin": "",
+      "expected_stdout": "fault=not-present vpn=0x12\n",
+      "expected_exit": 3,
+      "timeout": 3
+    },
+    {
+      "name": "reject-reserved-pte-bit-before-translation",
+      "argv": ["{build}/program", "read", "0x1234", "0xab09"],
+      "stdin": "",
+      "expected_stdout": "error: PTE reserved bits 7..3 must be zero\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-virtual-address-overflow",
+      "argv": ["{build}/program", "execute", "65536", "0x0005"],
+      "stdin": "",
+      "expected_stdout": "error: VA must be an unsigned 16-bit integer\n",
+      "expected_exit": 2,
+      "timeout": 3
+    }
+  ]
+}

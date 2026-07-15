@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "gate-02",
+  "questions": [
+    {
+      "prompt": "In clocked SystemVerilog, why are nonblocking assignments normally used for registers?",
+      "choices": {
+        "A": "They make simulation run without a clock",
+        "B": "Right-hand sides observe the old cycle state and updates commit together",
+        "C": "They automatically synthesize a faster circuit",
+        "D": "They prevent all timing violations"
+      },
+      "answer": "B",
+      "explanation": "Nonblocking assignment models simultaneous register updates: calculations use pre-edge state and visible updates commit after the event. It does not remove clocks or electrical timing constraints."
+    },
+    {
+      "prompt": "A counter toggles an LED every N input clocks. Ignoring reset, what is the full LED waveform period?",
+      "choices": {
+        "A": "N clocks",
+        "B": "2N clocks",
+        "C": "N/2 clocks",
+        "D": "One clock"
+      },
+      "answer": "B",
+      "explanation": "One toggle changes only half of the square-wave cycle. It takes two groups of N clocks to return the LED to its original level."
+    },
+    {
+      "prompt": "What is the standard bit order of an 8N1 UART frame on the wire?",
+      "choices": {
+        "A": "Stop, eight data bits MSB-first, start",
+        "B": "Start, eight data bits LSB-first, stop",
+        "C": "Start, parity, eight data bits MSB-first",
+        "D": "Eight data bits LSB-first with no framing bits"
+      },
+      "answer": "B",
+      "explanation": "8N1 means one start bit, eight data bits sent least significant first, no parity, and one stop bit."
+    },
+    {
+      "prompt": "Which MMIO register behavior most needs an explicit side-effect contract?",
+      "choices": {
+        "A": "A read-only constant device identifier",
+        "B": "A status bit that clears when its data register is read",
+        "C": "A reserved register that always reads zero",
+        "D": "A write-only LED value"
+      },
+      "answer": "B",
+      "explanation": "Read-to-clear couples observation with state mutation and can race a new event. Software and hardware need exact same-cycle and acknowledgment semantics."
+    },
+    {
+      "prompt": "When expected and actual waveforms differ, which cycle is usually the most useful debugging anchor?",
+      "choices": {
+        "A": "The final cycle where output is visibly wrong",
+        "B": "The first cycle where any architectural or interface state diverges",
+        "C": "A random cycle near the middle",
+        "D": "Only the reset cycle"
+      },
+      "answer": "B",
+      "explanation": "Later mismatches are often consequences. The first divergence is closest to the violated transition or input assumption and sharply narrows the search."
+    }
+  ]
+}

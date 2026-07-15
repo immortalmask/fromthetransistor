@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "id": "lab-03-cpu",
+  "module": "03.02",
+  "title": "Fetch, Decode, Execute",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "halt-from-reset",
+      "argv": ["{build}/program", "0000"],
+      "stdin": "",
+      "expected_stdout": "halted steps=1 pc=0\nregisters r0=00 r1=00 r2=00 r3=00 r4=00 r5=00 r6=00 r7=00 r8=00 r9=00 r10=00 r11=00 r12=00 r13=00 r14=00 r15=00\nmemory empty\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "wrapping-addition",
+      "argv": ["{build}/program", "11fe", "1205", "2120", "0000"],
+      "stdin": "",
+      "expected_stdout": "halted steps=4 pc=3\nregisters r0=00 r1=03 r2=05 r3=00 r4=00 r5=00 r6=00 r7=00 r8=00 r9=00 r10=00 r11=00 r12=00 r13=00 r14=00 r15=00\nmemory empty\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "store-then-load",
+      "argv": ["{build}/program", "11ab", "5110", "4210", "0000"],
+      "stdin": "",
+      "expected_stdout": "halted steps=4 pc=3\nregisters r0=00 r1=ab r2=ab r3=00 r4=00 r5=00 r6=00 r7=00 r8=00 r9=00 r10=00 r11=00 r12=00 r13=00 r14=00 r15=00\nmemory 10=ab\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "taken-relative-branch",
+      "argv": ["{build}/program", "1100", "7101", "122a", "1207", "0000"],
+      "stdin": "",
+      "expected_stdout": "halted steps=4 pc=4\nregisters r0=00 r1=00 r2=07 r3=00 r4=00 r5=00 r6=00 r7=00 r8=00 r9=00 r10=00 r11=00 r12=00 r13=00 r14=00 r15=00\nmemory empty\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "execution-budget-stops-loop",
+      "argv": ["{build}/program", "6000"],
+      "stdin": "",
+      "expected_stdout": "error: execution budget exceeded after 256 steps\n",
+      "expected_exit": 3,
+      "timeout": 3
+    },
+    {
+      "name": "executes-assembler-xor-encoding",
+      "argv": ["{build}/program", "11aa", "1255", "3120", "0000"],
+      "stdin": "",
+      "expected_stdout": "halted steps=4 pc=3\nregisters r0=00 r1=ff r2=55 r3=00 r4=00 r5=00 r6=00 r7=00 r8=00 r9=00 r10=00 r11=00 r12=00 r13=00 r14=00 r15=00\nmemory empty\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "nonzero-register-does-not-take-branch",
+      "argv": ["{build}/program", "1101", "7101", "122a", "0000"],
+      "stdin": "",
+      "expected_stdout": "halted steps=4 pc=3\nregisters r0=00 r1=01 r2=2a r3=00 r4=00 r5=00 r6=00 r7=00 r8=00 r9=00 r10=00 r11=00 r12=00 r13=00 r14=00 r15=00\nmemory empty\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "absolute-jump-skips-instruction",
+      "argv": ["{build}/program", "6002", "11ff", "0000"],
+      "stdin": "",
+      "expected_stdout": "halted steps=2 pc=2\nregisters r0=00 r1=00 r2=00 r3=00 r4=00 r5=00 r6=00 r7=00 r8=00 r9=00 r10=00 r11=00 r12=00 r13=00 r14=00 r15=00\nmemory empty\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-reserved-encoding-emitted-by-no-valid-assembler-input",
+      "argv": ["{build}/program", "2121"],
+      "stdin": "",
+      "expected_stdout": "error: invalid instruction 0x2121 at pc 0\n",
+      "expected_exit": 3,
+      "timeout": 3
+    },
+    {
+      "name": "reject-negative-relative-branch-target",
+      "argv": ["{build}/program", "70fe"],
+      "stdin": "",
+      "expected_stdout": "error: branch target -1 is outside program\n",
+      "expected_exit": 3,
+      "timeout": 3
+    }
+  ]
+}

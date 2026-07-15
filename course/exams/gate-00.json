@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "gate-00",
+  "questions": [
+    {
+      "prompt": "A decoder needs two bytes starting at offset i in a buffer of length n. Which check is both sufficient and resistant to unsigned wraparound?",
+      "choices": {
+        "A": "i + 2 <= n",
+        "B": "i < n",
+        "C": "i <= n && 2 <= n - i",
+        "D": "i != 0 && n >= 2"
+      },
+      "answer": "C",
+      "explanation": "Proving i is in the closed range through n makes n - i defined, then the remaining-length check avoids wrapping i + 2. The other checks either can wrap or do not prove two bytes remain."
+    },
+    {
+      "prompt": "Which expression portably decodes the little-endian bytes p[0] and p[1] as an unsigned 16-bit value?",
+      "choices": {
+        "A": "*(const uint16_t *)p",
+        "B": "(uint16_t)p[0] | ((uint16_t)p[1] << 8)",
+        "C": "((uint16_t)p[0] << 8) | p[1]",
+        "D": "memcpy(&value, p, 2)"
+      },
+      "answer": "B",
+      "explanation": "Explicit byte assembly states the wire order and avoids alignment and aliasing assumptions. A cast is not portable, C is big-endian decoding, and memcpy alone still gives host byte order."
+    },
+    {
+      "prompt": "Inside a function parameter declared as char data[32], what does sizeof(data) normally evaluate as?",
+      "choices": {
+        "A": "32",
+        "B": "The number of initialized characters",
+        "C": "The size of char *",
+        "D": "A compile-time error"
+      },
+      "answer": "C",
+      "explanation": "An array parameter is adjusted to a pointer parameter. The callee must receive length separately; sizeof cannot recover the caller's array bound."
+    },
+    {
+      "prompt": "An initializer allocates resource A, then allocation of B fails. What ownership rule gives the safest cleanup?",
+      "choices": {
+        "A": "Return immediately and let the operating system recover A",
+        "B": "Publish the partly initialized object and document that callers must guess what exists",
+        "C": "Initialize fields to an empty state and unwind every resource acquired so far",
+        "D": "Retry allocation B forever"
+      },
+      "answer": "C",
+      "explanation": "A documented empty state and reverse-order unwind make partial initialization reviewable and prevent leaks or destruction of uninitialized fields."
+    },
+    {
+      "prompt": "For a synchronous state machine using next_state and state, when should state normally change?",
+      "choices": {
+        "A": "Whenever any combinational input changes",
+        "B": "Only on the selected clock edge or explicit reset event",
+        "C": "At the end of each host-language loop iteration",
+        "D": "Only when output changes"
+      },
+      "answer": "B",
+      "explanation": "Combinational logic computes a candidate next state; the register commits it on the defined clock edge. Mixing the two destroys cycle-level reasoning."
+    }
+  ]
+}

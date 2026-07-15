@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "id": "lab-03-assembler",
+  "module": "03.01",
+  "title": "A Fixed-Width Assembler",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "assemble-halt",
+      "argv": ["{build}/program", "asm", "halt"],
+      "stdin": "",
+      "expected_stdout": "word=0x0000 bytes=00 00\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "assemble-immediate",
+      "argv": ["{build}/program", "asm", "ldi", "r2", "42"],
+      "stdin": "",
+      "expected_stdout": "word=0x122a bytes=2a 12\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "assemble-register-operation",
+      "argv": ["{build}/program", "asm", "add", "r1", "r2"],
+      "stdin": "",
+      "expected_stdout": "word=0x2120 bytes=20 21\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "assemble-negative-branch",
+      "argv": ["{build}/program", "asm", "jz", "r3", "-2"],
+      "stdin": "",
+      "expected_stdout": "word=0x73fe bytes=fe 73\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "disassemble-immediate",
+      "argv": ["{build}/program", "dis", "122a"],
+      "stdin": "",
+      "expected_stdout": "ldi r2, 42\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "disassemble-signed-branch",
+      "argv": ["{build}/program", "dis", "73fe"],
+      "stdin": "",
+      "expected_stdout": "jz r3, -2\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "assemble-xor-at-register-boundary",
+      "argv": ["{build}/program", "asm", "xor", "r15", "r0"],
+      "stdin": "",
+      "expected_stdout": "word=0x3f00 bytes=00 3f\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "assemble-load-at-address-boundary",
+      "argv": ["{build}/program", "asm", "load", "r15", "255"],
+      "stdin": "",
+      "expected_stdout": "word=0x4fff bytes=ff 4f\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "assemble-store-zero-address",
+      "argv": ["{build}/program", "asm", "store", "r0", "0"],
+      "stdin": "",
+      "expected_stdout": "word=0x5000 bytes=00 50\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "assemble-maximum-jump-target",
+      "argv": ["{build}/program", "asm", "jmp", "4095"],
+      "stdin": "",
+      "expected_stdout": "word=0x6fff bytes=ff 6f\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "assemble-minimum-signed-branch",
+      "argv": ["{build}/program", "asm", "jz", "r0", "-128"],
+      "stdin": "",
+      "expected_stdout": "word=0x7080 bytes=80 70\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "disassemble-xor-round-trip",
+      "argv": ["{build}/program", "dis", "3f00"],
+      "stdin": "",
+      "expected_stdout": "xor r15, r0\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-reserved-alu-low-nibble",
+      "argv": ["{build}/program", "dis", "2121"],
+      "stdin": "",
+      "expected_stdout": "error: reserved or unknown instruction encoding\n",
+      "expected_exit": 2,
+      "timeout": 3
+    }
+  ]
+}

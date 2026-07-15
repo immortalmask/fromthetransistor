@@ -1,0 +1,3591 @@
+{
+  "schema_version": 1,
+  "track": {
+    "id": "historically-aligned-hard-track",
+    "title": "Historically Aligned Hard Track",
+    "description": "Sixty-four unusual, cumulative systems problems that expand the runnable core toward the original transistor-to-browser ambition without claiming undocumented author intent or making unsafe physical work mandatory."
+  },
+  "packs": [
+    {
+      "id": "00",
+      "slug": "hostile-c-binary-forensics",
+      "title": "Hostile C and Binary Forensics",
+      "path": "vault/Challenges/00 Hostile C and Binary Forensics.md",
+      "overview": "Turn the C runway into a forensic laboratory where formats, lifetimes, ABI boundaries, state machines, and build evidence must survive hostile inputs.",
+      "entry_gate": "Complete modules 00.01 through 00.08 and pass gate-00 before starting the boss.",
+      "stage_handoff": "A capsule-v1 replay format, libbyte artifact, minimized corpus, and reproducible-build manifest consumed by every later stage.",
+      "safety": "Run unknown bytes only through bounded parsers or the course machine; sanitizers are diagnostics, not a hostile-code sandbox.",
+      "sources": [
+        {
+          "title": "WG14 N2176 C17 draft",
+          "url": "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2176.pdf",
+          "use": "Define integer, lifetime, representation, and undefined-behavior boundaries for every C artifact."
+        },
+        {
+          "title": "System V ABI ELF specification",
+          "url": "https://gabi.xinuos.com/",
+          "use": "Ground object, symbol, section, relocation, and ABI investigations in the executable-format contract."
+        },
+        {
+          "title": "Clang AddressSanitizer documentation",
+          "url": "https://clang.llvm.org/docs/AddressSanitizer.html",
+          "use": "Configure reproducible memory-safety evidence without treating instrumentation as a proof."
+        },
+        {
+          "title": "Reproducible Builds documentation",
+          "url": "https://reproducible-builds.org/docs/",
+          "use": "Design two-root and two-time experiments and record every input affecting output hashes."
+        }
+      ],
+      "challenges": [
+        {
+          "id": "H00.01",
+          "stars": 1,
+          "stage": "00",
+          "title": "Binary Palimpsest",
+          "slug": "binary-palimpsest",
+          "lane": "archaeology",
+          "difficulty": "very hard",
+          "estimated_hours": 18,
+          "prerequisites": [
+            "00.04"
+          ],
+          "brief": "Infer a mixed-endian checksummed format from specimens, then implement a strict C decoder and inverse encoder.",
+          "artifact": "C codec, recovered schema, and specimen corpus",
+          "deliverables": [
+            "A working C codec, recovered schema, and specimen corpus with reproducible build and invocation instructions.",
+            "A deterministic oracle or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with hashes, first divergence, invariant, and known limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit resource bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "Validate bounded data before mutation or output and keep raw evidence immutable."
+          ],
+          "adversarial_cases": [
+            "one-bit checksum mutation",
+            "truncated multibyte field",
+            "bytes defeating host-endian casts"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays and invalid input becomes a typed failure rather than a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tool versions, hashes, first divergence, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented conversion or manual repair."
+            }
+          ],
+          "handoff": "The schema and codec become the byte-boundary library for capsule-v1.",
+          "safety": "Run unknown bytes only through bounded parsers or the course machine; sanitizers are diagnostics, not a hostile-code sandbox."
+        },
+        {
+          "id": "H00.02",
+          "stars": 1,
+          "stage": "00",
+          "title": "ABI Doppelganger",
+          "slug": "abi-doppelganger",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 22,
+          "prerequisites": [
+            "00.07",
+            "H00.01"
+          ],
+          "brief": "Inspect immutable object files with incompatible layout or calling assumptions and build the smallest C or assembly shim.",
+          "artifact": "ABI shim, annotated disassembly, and relocation report",
+          "deliverables": [
+            "A working ABI shim, annotated disassembly, and relocation report with reproducible build and invocation instructions.",
+            "A deterministic oracle or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with hashes, first divergence, invariant, and known limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit resource bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "Validate bounded data before mutation or output and keep raw evidence immutable."
+          ],
+          "adversarial_cases": [
+            "callee-saved register clobber",
+            "padded structure with wrong layout",
+            "symbol resolving to wrong section"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays and invalid input becomes a typed failure rather than a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tool versions, hashes, first divergence, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented conversion or manual repair."
+            }
+          ],
+          "handoff": "The call trace seeds compiler and linker ABI tests.",
+          "safety": "Run unknown bytes only through bounded parsers or the course machine; sanitizers are diagnostics, not a hostile-code sandbox."
+        },
+        {
+          "id": "H00.03",
+          "stars": 2,
+          "stage": "00",
+          "title": "Lifetime Crime Scene",
+          "slug": "lifetime-crime-scene",
+          "lane": "adversary",
+          "difficulty": "very hard",
+          "estimated_hours": 20,
+          "prerequisites": [
+            "00.06"
+          ],
+          "brief": "Minimize and repair use-after-free, double-free, and leak faults hidden behind an opaque library.",
+          "artifact": "repaired C client, fail-at-N allocator, and ownership traces",
+          "deliverables": [
+            "A working repaired C client, fail-at-N allocator, and ownership traces with reproducible build and invocation instructions.",
+            "A deterministic oracle or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with hashes, first divergence, invariant, and known limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit resource bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "Validate bounded data before mutation or output and keep raw evidence immutable."
+          ],
+          "adversarial_cases": [
+            "failure after each allocation",
+            "partial initialization cleanup",
+            "alias outliving its owner"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays and invalid input becomes a typed failure rather than a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tool versions, hashes, first divergence, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented conversion or manual repair."
+            }
+          ],
+          "handoff": "The failure injector is reused by runtime and kernel work.",
+          "safety": "Run unknown bytes only through bounded parsers or the course machine; sanitizers are diagnostics, not a hostile-code sandbox."
+        },
+        {
+          "id": "H00.04",
+          "stars": 2,
+          "stage": "00",
+          "title": "Bitstream Courier",
+          "slug": "bitstream-courier",
+          "lane": "construction",
+          "difficulty": "very hard",
+          "estimated_hours": 18,
+          "prerequisites": [
+            "00.04",
+            "H00.01"
+          ],
+          "brief": "Build a bounded bit reader and writer for cross-byte fields in both bit orders without undefined shifts.",
+          "artifact": "portable C bitstream library, oracle, and corpus",
+          "deliverables": [
+            "A working portable C bitstream library, oracle, and corpus with reproducible build and invocation instructions.",
+            "A deterministic oracle or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with hashes, first divergence, invariant, and known limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit resource bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "Validate bounded data before mutation or output and keep raw evidence immutable."
+          ],
+          "adversarial_cases": [
+            "32-bit field at final legal bit",
+            "zero-capacity destination",
+            "opposite orders over same bytes"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays and invalid input becomes a typed failure rather than a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tool versions, hashes, first divergence, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented conversion or manual repair."
+            }
+          ],
+          "handoff": "The codec feeds serial, ISA, packet, and JTAG fields.",
+          "safety": "Run unknown bytes only through bounded parsers or the course machine; sanitizers are diagnostics, not a hostile-code sandbox."
+        },
+        {
+          "id": "H00.05",
+          "stars": 2,
+          "stage": "00",
+          "title": "State-Machine Witness",
+          "slug": "state-machine-witness",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 24,
+          "prerequisites": [
+            "00.08"
+          ],
+          "brief": "Recover the smallest Mealy machine consistent with incomplete traces and construct distinguishing sequences.",
+          "artifact": "table-driven C machine, inference report, and minimality certificate",
+          "deliverables": [
+            "A working table-driven C machine, inference report, and minimality certificate with reproducible build and invocation instructions.",
+            "A deterministic oracle or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with hashes, first divergence, invariant, and known limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit resource bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "Validate bounded data before mutation or output and keep raw evidence immutable."
+          ],
+          "adversarial_cases": [
+            "states separated by long suffix",
+            "trace ending before output",
+            "nonminimal candidate"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays and invalid input becomes a typed failure rather than a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tool versions, hashes, first divergence, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented conversion or manual repair."
+            }
+          ],
+          "handoff": "The inferred-machine schema becomes the logic black-box oracle.",
+          "safety": "Run unknown bytes only through bounded parsers or the course machine; sanitizers are diagnostics, not a hostile-code sandbox."
+        },
+        {
+          "id": "H00.06",
+          "stars": 2,
+          "stage": "00",
+          "title": "Length-Field Siege",
+          "slug": "length-field-siege",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 24,
+          "prerequisites": [
+            "00.05",
+            "H00.04"
+          ],
+          "brief": "Implement an iterative nested TLV parser whose progress, depth, arithmetic, and output remain bounded.",
+          "artifact": "bounded C parser, grammar generator, and rejection corpus",
+          "deliverables": [
+            "A working bounded C parser, grammar generator, and rejection corpus with reproducible build and invocation instructions.",
+            "A deterministic oracle or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with hashes, first divergence, invariant, and known limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit resource bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "Validate bounded data before mutation or output and keep raw evidence immutable."
+          ],
+          "adversarial_cases": [
+            "length wrapping with header",
+            "maximum-depth empty containers",
+            "child extending beyond parent"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays and invalid input becomes a typed failure rather than a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tool versions, hashes, first divergence, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented conversion or manual repair."
+            }
+          ],
+          "handoff": "The budgets and minimizer become the hostile-input harness.",
+          "safety": "Run unknown bytes only through bounded parsers or the course machine; sanitizers are diagnostics, not a hostile-code sandbox."
+        },
+        {
+          "id": "H00.07",
+          "stars": 2,
+          "stage": "00",
+          "title": "Reproducibility Autopsy",
+          "slug": "reproducibility-autopsy",
+          "lane": "archaeology",
+          "difficulty": "very hard",
+          "estimated_hours": 16,
+          "prerequisites": [
+            "00.02",
+            "00.07"
+          ],
+          "brief": "Diagnose path, time, locale, and input-order nondeterminism until independent builds produce identical bytes.",
+          "artifact": "repaired build, two-environment transcript, and hash manifest",
+          "deliverables": [
+            "A working repaired build, two-environment transcript, and hash manifest with reproducible build and invocation instructions.",
+            "A deterministic oracle or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with hashes, first divergence, invariant, and known limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit resource bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "Validate bounded data before mutation or output and keep raw evidence immutable."
+          ],
+          "adversarial_cases": [
+            "different checkout roots",
+            "different locale and timezone",
+            "shuffled archive members"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays and invalid input becomes a typed failure rather than a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tool versions, hashes, first divergence, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented conversion or manual repair."
+            }
+          ],
+          "handoff": "The manifest and clean-room probe are required by later bosses.",
+          "safety": "Run unknown bytes only through bounded parsers or the course machine; sanitizers are diagnostics, not a hostile-code sandbox."
+        },
+        {
+          "id": "H00.08",
+          "stars": 3,
+          "stage": "00",
+          "title": "Boss: Evidence Capsule",
+          "slug": "boss-evidence-capsule",
+          "lane": "boss",
+          "difficulty": "brutal",
+          "estimated_hours": 30,
+          "prerequisites": [
+            "H00.01",
+            "H00.05",
+            "H00.06",
+            "H00.07"
+          ],
+          "brief": "Create capsule-v1 for input, seed, expected trace, hashes, and replay metadata, rejecting corruption before replay.",
+          "artifact": "versioned capsule tool, replay engine, schema, and corruption corpus",
+          "deliverables": [
+            "A working versioned capsule tool, replay engine, schema, and corruption corpus with reproducible build and invocation instructions.",
+            "A deterministic oracle or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with hashes, first divergence, invariant, and known limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit resource bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "Validate bounded data before mutation or output and keep raw evidence immutable."
+          ],
+          "adversarial_cases": [
+            "truncated manifest",
+            "artifact digest mismatch",
+            "workspace-escaping path"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays and invalid input becomes a typed failure rather than a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tool versions, hashes, first divergence, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented conversion or manual repair."
+            }
+          ],
+          "handoff": "capsule-v1 becomes the cross-stage evidence transport.",
+          "safety": "Run unknown bytes only through bounded parsers or the course machine; sanitizers are diagnostics, not a hostile-code sandbox."
+        }
+      ]
+    },
+    {
+      "id": "01",
+      "slug": "logic-cross-examination",
+      "title": "Logic Under Cross-Examination",
+      "path": "vault/Challenges/01 Logic Under Cross-Examination.md",
+      "overview": "Build independent C and RTL models, then attack reset, timing, handshake, and waveform assumptions until the first divergent edge is reproducible.",
+      "entry_gate": "Complete modules 01.01 and 01.02, gate-00, and the H00 capsule handoff.",
+      "stage_handoff": "A simtrace-v1 edge schema, synthesizable clockwork block, C logic oracle, mutation report, and reset contract.",
+      "safety": "All required work is simulation-only; synthesis is optional and does not prove timing closure or electrical behavior.",
+      "sources": [
+        {
+          "title": "Verilator trace options",
+          "url": "https://verilator.org/guide/latest/exe_verilator.html#cmdoption-trace",
+          "use": "Produce stable waveform evidence and understand simulator trace controls."
+        },
+        {
+          "title": "AMD configurable logic guide UG574",
+          "url": "https://docs.amd.com/r/en-US/ug574-ultrascale-clb",
+          "use": "Relate LUT, carry, register, and control-set models to documented FPGA resources."
+        },
+        {
+          "title": "cocotb timing model",
+          "url": "https://docs.cocotb.org/en/stable/timing_model.html",
+          "use": "Define phases, edge observations, and race-free mixed-language checking."
+        },
+        {
+          "title": "Yosys documentation",
+          "url": "https://yosyshq.readthedocs.io/projects/yosys/en/latest/",
+          "use": "Inspect synthesized structure while separating logical equivalence from source appearance."
+        }
+      ],
+      "challenges": [
+        {
+          "id": "H01.01",
+          "stars": 1,
+          "stage": "01",
+          "title": "Faulty LUT Forensic",
+          "slug": "faulty-lut-forensic",
+          "lane": "archaeology",
+          "difficulty": "very hard",
+          "estimated_hours": 16,
+          "prerequisites": [
+            "01.01",
+            "H00.05",
+            "H00.08"
+          ],
+          "brief": "Identify swapped inputs, inverted pins, and reversed LUT indexing from sparse black-box samples using minimal probes.",
+          "artifact": "diagnosis engine, minimal probe set, and repaired LUT map",
+          "deliverables": [
+            "A working diagnosis engine, minimal probe set, and repaired LUT map with reproducible build and invocation instructions.",
+            "An independent model or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with trace hashes, first divergence, invariant, and limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit cycle and memory bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "State changes occur on documented edges and raw traces remain immutable."
+          ],
+          "adversarial_cases": [
+            "both inputs swapped",
+            "one pin inverted",
+            "configuration bits reversed"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays and the first divergent edge is reported without a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, mutation result, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented timing or reset conversion."
+            }
+          ],
+          "handoff": "The recovered LUT convention becomes the logic oracle's indexing rule.",
+          "safety": "All required work is simulation-only; synthesis is optional and does not prove timing closure or electrical behavior."
+        },
+        {
+          "id": "H01.02",
+          "stars": 1,
+          "stage": "01",
+          "title": "LUT ALU Synthesis",
+          "slug": "lut-alu-synthesis",
+          "lane": "construction",
+          "difficulty": "brutal",
+          "estimated_hours": 28,
+          "prerequisites": [
+            "01.01",
+            "H01.01"
+          ],
+          "brief": "Construct an eight-bit ALU only from LUT, mux, carry, and register primitives with explicit width and flags.",
+          "artifact": "structural ALU, exhaustive oracle, and resource report",
+          "deliverables": [
+            "A working structural ALU, exhaustive oracle, and resource report with reproducible build and invocation instructions.",
+            "An independent model or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with trace hashes, first divergence, invariant, and limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit cycle and memory bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "State changes occur on documented edges and raw traces remain immutable."
+          ],
+          "adversarial_cases": [
+            "most-significant carry",
+            "signed overflow without carry",
+            "unsupported opcode beside reset"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays and the first divergent edge is reported without a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, mutation result, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented timing or reset conversion."
+            }
+          ],
+          "handoff": "The ALU state schema feeds the clockwork boss and CPU comparisons.",
+          "safety": "All required work is simulation-only; synthesis is optional and does not prove timing closure or electrical behavior."
+        },
+        {
+          "id": "H01.03",
+          "stars": 2,
+          "stage": "01",
+          "title": "Handshake Adversary",
+          "slug": "handshake-adversary",
+          "lane": "adversary",
+          "difficulty": "very hard",
+          "estimated_hours": 20,
+          "prerequisites": [
+            "01.02",
+            "H00.05"
+          ],
+          "brief": "Design a ready-valid channel and prove no loss, duplication, or reordering across arbitrary stalls and reset.",
+          "artifact": "C and RTL channel models, schedule generator, and invariant monitor",
+          "deliverables": [
+            "A working C and RTL channel models, schedule generator, and invariant monitor with reproducible build and invocation instructions.",
+            "An independent model or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with trace hashes, first divergence, invariant, and limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit cycle and memory bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "State changes occur on documented edges and raw traces remain immutable."
+          ],
+          "adversarial_cases": [
+            "ready toggling every cycle",
+            "reset with unconsumed item",
+            "completion during consumer stall"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays and the first divergent edge is reported without a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, mutation result, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented timing or reset conversion."
+            }
+          ],
+          "handoff": "The channel contract becomes the MMIO transaction primitive.",
+          "safety": "All required work is simulation-only; synthesis is optional and does not prove timing closure or electrical behavior."
+        },
+        {
+          "id": "H01.04",
+          "stars": 2,
+          "stage": "01",
+          "title": "Sequential Black-Box Inference",
+          "slug": "sequential-black-box-inference",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 24,
+          "prerequisites": [
+            "01.02",
+            "H01.03"
+          ],
+          "brief": "Recover hidden reset, enable, rollover, and latency semantics from traces of a sequential component.",
+          "artifact": "candidate machine family, experiment planner, and final model",
+          "deliverables": [
+            "A working candidate machine family, experiment planner, and final model with reproducible build and invocation instructions.",
+            "An independent model or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with trace hashes, first divergence, invariant, and limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit cycle and memory bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "State changes occur on documented edges and raw traces remain immutable."
+          ],
+          "adversarial_cases": [
+            "synchronous versus asynchronous reset",
+            "enable sampled one edge late",
+            "separately registered rollover output"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays and the first divergent edge is reported without a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, mutation result, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented timing or reset conversion."
+            }
+          ],
+          "handoff": "The inference planner is retained for clock, UART, and board archaeology.",
+          "safety": "All required work is simulation-only; synthesis is optional and does not prove timing closure or electrical behavior."
+        },
+        {
+          "id": "H01.05",
+          "stars": 2,
+          "stage": "01",
+          "title": "Waveform Bisection",
+          "slug": "waveform-bisection",
+          "lane": "construction",
+          "difficulty": "very hard",
+          "estimated_hours": 18,
+          "prerequisites": [
+            "01.02",
+            "H01.03"
+          ],
+          "brief": "Compare VCD and JSON traces and return the first causally meaningful divergent edge.",
+          "artifact": "trace normalizer, comparator, and minimized divergence slice",
+          "deliverables": [
+            "A working trace normalizer, comparator, and minimized divergence slice with reproducible build and invocation instructions.",
+            "An independent model or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with trace hashes, first divergence, invariant, and limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit cycle and memory bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "State changes occur on documented edges and raw traces remain immutable."
+          ],
+          "adversarial_cases": [
+            "different declaration order",
+            "unknown values before reset",
+            "late visible effect of hidden divergence"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays and the first divergent edge is reported without a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, mutation result, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented timing or reset conversion."
+            }
+          ],
+          "handoff": "simtrace-v1 becomes the shared evidence format.",
+          "safety": "All required work is simulation-only; synthesis is optional and does not prove timing closure or electrical behavior."
+        },
+        {
+          "id": "H01.06",
+          "stars": 2,
+          "stage": "01",
+          "title": "RTL Mutant Killer",
+          "slug": "rtl-mutant-killer",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 26,
+          "prerequisites": [
+            "H01.02",
+            "H01.03",
+            "H01.05"
+          ],
+          "brief": "Kill reset, blocking-assignment, stale-state, truncation, and off-by-one RTL mutants.",
+          "artifact": "mutant suite, discriminating tests, and survivor analysis",
+          "deliverables": [
+            "A working mutant suite, discriminating tests, and survivor analysis with reproducible build and invocation instructions.",
+            "An independent model or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with trace hashes, first divergence, invariant, and limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit cycle and memory bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "State changes occur on documented edges and raw traces remain immutable."
+          ],
+          "adversarial_cases": [
+            "reset bug after prior state",
+            "counter width truncation",
+            "output from stale state"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays and the first divergent edge is reported without a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, mutation result, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented timing or reset conversion."
+            }
+          ],
+          "handoff": "The mutation runner and threshold are reused for UART and CPU.",
+          "safety": "All required work is simulation-only; synthesis is optional and does not prove timing closure or electrical behavior."
+        },
+        {
+          "id": "H01.07",
+          "stars": 2,
+          "stage": "01",
+          "title": "C versus RTL Differential",
+          "slug": "c-versus-rtl-differential",
+          "lane": "integration",
+          "difficulty": "brutal",
+          "estimated_hours": 30,
+          "prerequisites": [
+            "H01.05",
+            "H01.06"
+          ],
+          "brief": "Compare structurally independent C and synthesizable RTL models edge by edge over generated schedules.",
+          "artifact": "independent models, differential driver, and mismatch capsules",
+          "deliverables": [
+            "A working independent models, differential driver, and mismatch capsules with reproducible build and invocation instructions.",
+            "An independent model or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with trace hashes, first divergence, invariant, and limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit cycle and memory bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "State changes occur on documented edges and raw traces remain immutable."
+          ],
+          "adversarial_cases": [
+            "reset beside input change",
+            "maximum-width rollover",
+            "long stall then transfer"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays and the first divergent edge is reported without a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, mutation result, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented timing or reset conversion."
+            }
+          ],
+          "handoff": "The paired oracle becomes the standard device-validation harness.",
+          "safety": "All required work is simulation-only; synthesis is optional and does not prove timing closure or electrical behavior."
+        },
+        {
+          "id": "H01.08",
+          "stars": 3,
+          "stage": "01",
+          "title": "Boss: Deterministic Clockwork",
+          "slug": "boss-deterministic-clockwork",
+          "lane": "boss",
+          "difficulty": "brutal",
+          "estimated_hours": 36,
+          "prerequisites": [
+            "H01.02",
+            "H01.04",
+            "H01.06",
+            "H01.07"
+          ],
+          "brief": "Compose ALU, inferred FSM, counter, and handshake channel into one reproducible clocked subsystem.",
+          "artifact": "synthesizable subsystem, C oracle, trace corpus, and seeded mutant",
+          "deliverables": [
+            "A working synthesizable subsystem, C oracle, trace corpus, and seeded mutant with reproducible build and invocation instructions.",
+            "An independent model or property suite plus a seeded adversarial regression corpus.",
+            "A replayable evidence packet with trace hashes, first divergence, invariant, and limitation."
+          ],
+          "constraints": [
+            "All required checks run offline with deterministic seeds and explicit cycle and memory bounds.",
+            "Implementation and oracle remain independently replaceable; fixed examples alone are insufficient.",
+            "State changes occur on documented edges and raw traces remain immutable."
+          ],
+          "adversarial_cases": [
+            "reset during backpressure",
+            "illegal accepted opcode",
+            "rollover during output transfer"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact builds warning-clean and passes deterministic reference checks from a fresh workspace."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays and the first divergent edge is reported without a crash or hang."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, mutation result, invariant, and known limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "A downstream probe consumes the handoff without undocumented timing or reset conversion."
+            }
+          ],
+          "handoff": "The frozen simtrace-v1, reset contract, and subsystem pass to bringup.",
+          "safety": "All required work is simulation-only; synthesis is optional and does not prove timing closure or electrical behavior."
+        }
+      ]
+    },
+    {
+      "id": "02",
+      "slug": "hostile-wire-bringup",
+      "title": "Bringup Through Hostile Wires",
+      "path": "vault/Challenges/02 Bringup Through Hostile Wires.md",
+      "overview": "Treat LED timing, serial framing, MMIO side effects, FIFOs, and host bridges as unknown or adversarial systems.",
+      "entry_gate": "Complete modules 02.01 and 02.02, gate-02, and the H01 clockwork handoff.",
+      "stage_handoff": "A bus-v1 register contract, cycle-accurate UART, recovery console, and transaction corpus.",
+      "safety": "Required transport is mocked or loopback-only; do not attach unknown hardware or drive pins without an electrical plan.",
+      "sources": [
+        {
+          "title": "OpenTitan UART theory",
+          "url": "https://opentitan.org/book/hw/ip/uart/doc/theory_of_operation.html",
+          "use": "Ground framing, oversampling, FIFOs, interrupts, and errors in a documented UART."
+        },
+        {
+          "title": "OpenTitan UART registers",
+          "url": "https://opentitan.org/book/hw/ip/uart/doc/registers.html",
+          "use": "Compare explicit register side effects against the inferred teaching contract."
+        },
+        {
+          "title": "Intel counter HDL guidelines",
+          "url": "https://www.intel.com/content/www/us/en/docs/programmable/683082/24-3/counter-hdl-guidelines.html",
+          "use": "Check counter width, enable, reset, and synthesis assumptions used by LED timing."
+        },
+        {
+          "title": "Intel synchronous reset guidance",
+          "url": "https://www.intel.com/content/www/us/en/docs/programmable/683082/25-1/use-synchronous-resets.html",
+          "use": "Make reset timing explicit before comparing simulation and observation."
+        }
+      ],
+      "challenges": [
+        {
+          "id": "H02.01",
+          "stars": 1,
+          "stage": "02",
+          "title": "Unknown-Clock Divider",
+          "slug": "unknown-clock-divider",
+          "lane": "archaeology",
+          "difficulty": "very hard",
+          "estimated_hours": 16,
+          "prerequisites": [
+            "02.01",
+            "H01.08"
+          ],
+          "brief": "Infer oscillator, divider convention, reset release, and pin inversion from a noisy LED trace.",
+          "artifact": "clock hypothesis report, divider model, and discriminating tests",
+          "deliverables": [
+            "A working clock hypothesis report, divider model, and discriminating tests with reproducible instructions.",
+            "An independent model plus a seeded adversarial corpus.",
+            "A replayable evidence packet with trace hashes and first divergence."
+          ],
+          "constraints": [
+            "Required checks are offline and deterministically bounded.",
+            "Oracle and implementation remain independently replaceable.",
+            "No payload is exposed before its framing or transaction is valid."
+          ],
+          "adversarial_cases": [
+            "off-by-one terminal count",
+            "clock wrong by integer factor",
+            "inverted LED pin"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic normal and boundary checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a typed bounded outcome."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared handoff without a hidden adapter."
+            }
+          ],
+          "handoff": "The accepted clock-reset contract parameterizes later UART and board traces.",
+          "safety": "Required transport is mocked or loopback-only; do not attach unknown hardware or drive pins without an electrical plan."
+        },
+        {
+          "id": "H02.02",
+          "stars": 1,
+          "stage": "02",
+          "title": "Autobaud Archaeology",
+          "slug": "autobaud-archaeology",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 22,
+          "prerequisites": [
+            "02.02",
+            "H00.04",
+            "H01.05"
+          ],
+          "brief": "Recover baud, polarity, bit order, and framing from captures with drift, gaps, truncation, and noise.",
+          "artifact": "capture decoder, hypothesis table, and minimized waveforms",
+          "deliverables": [
+            "A working capture decoder, hypothesis table, and minimized waveforms with reproducible instructions.",
+            "An independent model plus a seeded adversarial corpus.",
+            "A replayable evidence packet with trace hashes and first divergence."
+          ],
+          "constraints": [
+            "Required checks are offline and deterministically bounded.",
+            "Oracle and implementation remain independently replaceable.",
+            "No payload is exposed before its framing or transaction is valid."
+          ],
+          "adversarial_cases": [
+            "shortened start bit",
+            "reversed polarity",
+            "capture starting mid-frame"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic normal and boundary checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a typed bounded outcome."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared handoff without a hidden adapter."
+            }
+          ],
+          "handoff": "The decoded frame schema supplies receiver oracle vectors.",
+          "safety": "Required transport is mocked or loopback-only; do not attach unknown hardware or drive pins without an electrical plan."
+        },
+        {
+          "id": "H02.03",
+          "stars": 2,
+          "stage": "02",
+          "title": "Jittered UART Receiver",
+          "slug": "jittered-uart-receiver",
+          "lane": "construction",
+          "difficulty": "brutal",
+          "estimated_hours": 28,
+          "prerequisites": [
+            "H02.02"
+          ],
+          "brief": "Implement a cycle-accurate oversampling receiver that emits a byte only after a valid stop bit.",
+          "artifact": "C and RTL receivers, jitter generator, and error corpus",
+          "deliverables": [
+            "A working C and RTL receivers, jitter generator, and error corpus with reproducible instructions.",
+            "An independent model plus a seeded adversarial corpus.",
+            "A replayable evidence packet with trace hashes and first divergence."
+          ],
+          "constraints": [
+            "Required checks are offline and deterministically bounded.",
+            "Oracle and implementation remain independently replaceable.",
+            "No payload is exposed before its framing or transaction is valid."
+          ],
+          "adversarial_cases": [
+            "jitter on every bit",
+            "glitch near sample point",
+            "invalid stop after valid data"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic normal and boundary checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a typed bounded outcome."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared handoff without a hidden adapter."
+            }
+          ],
+          "handoff": "The receiver becomes the RX half of the bus-v1 UART.",
+          "safety": "Required transport is mocked or loopback-only; do not attach unknown hardware or drive pins without an electrical plan."
+        },
+        {
+          "id": "H02.04",
+          "stars": 2,
+          "stage": "02",
+          "title": "MMIO Register Archaeology",
+          "slug": "mmio-register-archaeology",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 22,
+          "prerequisites": [
+            "02.02",
+            "H00.05",
+            "H02.03"
+          ],
+          "brief": "Infer ready, overrun, clear-on-read, and write side effects from minimal black-box MMIO probes.",
+          "artifact": "generated register contract, inference driver, and ambiguity report",
+          "deliverables": [
+            "A working generated register contract, inference driver, and ambiguity report with reproducible instructions.",
+            "An independent model plus a seeded adversarial corpus.",
+            "A replayable evidence packet with trace hashes and first divergence."
+          ],
+          "constraints": [
+            "Required checks are offline and deterministically bounded.",
+            "Oracle and implementation remain independently replaceable.",
+            "No payload is exposed before its framing or transaction is valid."
+          ],
+          "adversarial_cases": [
+            "status read clearing one flag",
+            "data read while empty",
+            "write as TX becomes full"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic normal and boundary checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a typed bounded outcome."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared handoff without a hidden adapter."
+            }
+          ],
+          "handoff": "The machine-readable map becomes the sole UART interface.",
+          "safety": "Required transport is mocked or loopback-only; do not attach unknown hardware or drive pins without an electrical plan."
+        },
+        {
+          "id": "H02.05",
+          "stars": 2,
+          "stage": "02",
+          "title": "FIFO Under Siege",
+          "slug": "fifo-under-siege",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 24,
+          "prerequisites": [
+            "H01.03",
+            "H02.04"
+          ],
+          "brief": "Defend bounded TX and RX FIFOs against simultaneous access, backpressure, overflow, and reset.",
+          "artifact": "C and RTL FIFOs, schedule checker, and invariant log",
+          "deliverables": [
+            "A working C and RTL FIFOs, schedule checker, and invariant log with reproducible instructions.",
+            "An independent model plus a seeded adversarial corpus.",
+            "A replayable evidence packet with trace hashes and first divergence."
+          ],
+          "constraints": [
+            "Required checks are offline and deterministically bounded.",
+            "Oracle and implementation remain independently replaceable.",
+            "No payload is exposed before its framing or transaction is valid."
+          ],
+          "adversarial_cases": [
+            "enqueue and dequeue while full",
+            "receive overrun",
+            "reset between accept and consume"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic normal and boundary checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a typed bounded outcome."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared handoff without a hidden adapter."
+            }
+          ],
+          "handoff": "The verified FIFO completes the UART device model.",
+          "safety": "Required transport is mocked or loopback-only; do not attach unknown hardware or drive pins without an electrical plan."
+        },
+        {
+          "id": "H02.06",
+          "stars": 2,
+          "stage": "02",
+          "title": "Lying Host Bridge",
+          "slug": "lying-host-bridge",
+          "lane": "adversary",
+          "difficulty": "very hard",
+          "estimated_hours": 20,
+          "prerequisites": [
+            "H00.03",
+            "H02.05"
+          ],
+          "brief": "Write a bridge surviving short, delayed, duplicated, and disconnected transfers without inventing data.",
+          "artifact": "mockable C bridge, typed errors, and deterministic fault script",
+          "deliverables": [
+            "A working mockable C bridge, typed errors, and deterministic fault script with reproducible instructions.",
+            "An independent model plus a seeded adversarial corpus.",
+            "A replayable evidence packet with trace hashes and first divergence."
+          ],
+          "constraints": [
+            "Required checks are offline and deterministically bounded.",
+            "Oracle and implementation remain independently replaceable.",
+            "No payload is exposed before its framing or transaction is valid."
+          ],
+          "adversarial_cases": [
+            "zero-progress transfer",
+            "all-ones disconnect",
+            "duplicate completion after timeout"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic normal and boundary checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a typed bounded outcome."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared handoff without a hidden adapter."
+            }
+          ],
+          "handoff": "The bridge errors feed serial and later USB or network loaders.",
+          "safety": "Required transport is mocked or loopback-only; do not attach unknown hardware or drive pins without an electrical plan."
+        },
+        {
+          "id": "H02.07",
+          "stars": 2,
+          "stage": "02",
+          "title": "UART Mutant Farm",
+          "slug": "uart-mutant-farm",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 28,
+          "prerequisites": [
+            "H02.03",
+            "H02.05",
+            "H02.06"
+          ],
+          "brief": "Differentially test C, RTL, MMIO, and driver layers against timing, status, and retry mutants.",
+          "artifact": "layered runner, mutant suite, and first-edge capsules",
+          "deliverables": [
+            "A working layered runner, mutant suite, and first-edge capsules with reproducible instructions.",
+            "An independent model plus a seeded adversarial corpus.",
+            "A replayable evidence packet with trace hashes and first divergence."
+          ],
+          "constraints": [
+            "Required checks are offline and deterministically bounded.",
+            "Oracle and implementation remain independently replaceable.",
+            "No payload is exposed before its framing or transaction is valid."
+          ],
+          "adversarial_cases": [
+            "bit order exchanged",
+            "ready cleared late",
+            "completion before stop bit"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic normal and boundary checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a typed bounded outcome."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared handoff without a hidden adapter."
+            }
+          ],
+          "handoff": "The killed-mutant corpus becomes UART conformance evidence.",
+          "safety": "Required transport is mocked or loopback-only; do not attach unknown hardware or drive pins without an electrical plan."
+        },
+        {
+          "id": "H02.08",
+          "stars": 3,
+          "stage": "02",
+          "title": "Boss: Recovery Console",
+          "slug": "boss-recovery-console",
+          "lane": "boss",
+          "difficulty": "brutal",
+          "estimated_hours": 38,
+          "prerequisites": [
+            "H02.01",
+            "H02.03",
+            "H02.04",
+            "H02.05",
+            "H02.07"
+          ],
+          "brief": "Compose a framed console controlling LED and echo while resynchronizing after corruption or reset.",
+          "artifact": "console protocol, firmware model, UART subsystem, and transcript",
+          "deliverables": [
+            "A working console protocol, firmware model, UART subsystem, and transcript with reproducible instructions.",
+            "An independent model plus a seeded adversarial corpus.",
+            "A replayable evidence packet with trace hashes and first divergence."
+          ],
+          "constraints": [
+            "Required checks are offline and deterministically bounded.",
+            "Oracle and implementation remain independently replaceable.",
+            "No payload is exposed before its framing or transaction is valid."
+          ],
+          "adversarial_cases": [
+            "flipped length then valid command",
+            "reset mid-response",
+            "backpressure during error report"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic normal and boundary checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a typed bounded outcome."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared handoff without a hidden adapter."
+            }
+          ],
+          "handoff": "bus-v1, register map, UART, and recovery transcript pass to processor work.",
+          "safety": "Required transport is mocked or loopback-only; do not attach unknown hardware or drive pins without an electrical plan."
+        }
+      ]
+    },
+    {
+      "id": "03",
+      "slug": "isa-cpu-hostile-boot",
+      "title": "ISA CPU and Hostile Boot",
+      "path": "vault/Challenges/03 ISA CPU and Hostile Boot.md",
+      "overview": "Reconstruct instruction encodings, build independent execution models, mutate them, and carry an unknown ROM through hostile serial boot.",
+      "entry_gate": "Complete modules 03.01 through 03.03, gate-03, and the H02 recovery-console handoff.",
+      "stage_handoff": "A versioned ISA, assembler corpus, CPU trace ABI, boot monitor, and independently checked ROM repair.",
+      "safety": "Unknown target programs execute only inside bounded course emulators or an isolated comparison oracle.",
+      "sources": [
+        {
+          "title": "RISC-V RV32I specification",
+          "url": "https://docs.riscv.org/reference/isa/unpriv/rv32.html",
+          "use": "Compare a production fixed-width ISA's encoding, state, and exception language with FTT-16."
+        },
+        {
+          "title": "GNU assembler manual",
+          "url": "https://sourceware.org/binutils/docs/as/",
+          "use": "Study mature syntax, diagnostics, symbols, and sections while keeping the course format bounded."
+        },
+        {
+          "title": "MCUboot serial recovery",
+          "url": "https://docs.mcuboot.com/serial_recovery.html",
+          "use": "Inform framing, resynchronization, validation, and explicit recovery boundaries."
+        },
+        {
+          "title": "Sail RISC-V formal model",
+          "url": "https://github.com/riscv/sail-riscv",
+          "use": "Use an independently structured executable specification as a differential-testing model."
+        }
+      ],
+      "challenges": [
+        {
+          "id": "H03.01",
+          "stars": 1,
+          "stage": "03",
+          "title": "ISA Archaeology",
+          "slug": "isa-archaeology",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 26,
+          "prerequisites": [
+            "03.01",
+            "H00.01",
+            "H02.08"
+          ],
+          "brief": "Infer opcode fields, signed immediates, reserved encodings, and control flow from binaries and traces.",
+          "artifact": "recovered ISA table, probe programs, and confidence ledger",
+          "deliverables": [
+            "A working recovered ISA table, probe programs, and confidence ledger with reproducible instructions.",
+            "An independently structured oracle and seeded conformance corpus.",
+            "A replayable evidence packet with hashes and minimized divergence."
+          ],
+          "constraints": [
+            "All execution has explicit instruction, memory, and input budgets.",
+            "Oracle and implementation share only the versioned architecture contract.",
+            "Unsupported encodings and programs fail closed inside emulation."
+          ],
+          "adversarial_cases": [
+            "opcodes differing in reserved nibble",
+            "negative branch crossing zero",
+            "state change without output"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic architecture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial program replays with precise committed state or fault."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared image and trace handoff directly."
+            }
+          ],
+          "handoff": "The recovered table becomes isa-v1.",
+          "safety": "Unknown target programs execute only inside bounded course emulators or an isolated comparison oracle."
+        },
+        {
+          "id": "H03.02",
+          "stars": 1,
+          "stage": "03",
+          "title": "Lossless Assembler and Disassembler",
+          "slug": "lossless-assembler-and-disassembler",
+          "lane": "construction",
+          "difficulty": "brutal",
+          "estimated_hours": 30,
+          "prerequisites": [
+            "03.01",
+            "H03.01"
+          ],
+          "brief": "Implement labels, canonical disassembly, and rejection classes for the entire frozen FTT-16 word space.",
+          "artifact": "assembler, disassembler, word classifier, and diagnostic corpus",
+          "deliverables": [
+            "A working assembler, disassembler, word classifier, and diagnostic corpus with reproducible instructions.",
+            "An independently structured oracle and seeded conformance corpus.",
+            "A replayable evidence packet with hashes and minimized divergence."
+          ],
+          "constraints": [
+            "All execution has explicit instruction, memory, and input budgets.",
+            "Oracle and implementation share only the versioned architecture contract.",
+            "Unsupported encodings and programs fail closed inside emulation."
+          ],
+          "adversarial_cases": [
+            "every valid word",
+            "reserved bits on valid opcode",
+            "branch limits"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic architecture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial program replays with precise committed state or fault."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared image and trace handoff directly."
+            }
+          ],
+          "handoff": "The conformance corpus feeds CPU and compiler tests.",
+          "safety": "Unknown target programs execute only inside bounded course emulators or an isolated comparison oracle."
+        },
+        {
+          "id": "H03.03",
+          "stars": 2,
+          "stage": "03",
+          "title": "Independent CPU Oracle",
+          "slug": "independent-cpu-oracle",
+          "lane": "integration",
+          "difficulty": "brutal",
+          "estimated_hours": 36,
+          "prerequisites": [
+            "03.02",
+            "H03.02"
+          ],
+          "brief": "Compare a C executor with a structurally independent state oracle after every instruction.",
+          "artifact": "two CPU models, program generator, and fault corpus",
+          "deliverables": [
+            "A working two CPU models, program generator, and fault corpus with reproducible instructions.",
+            "An independently structured oracle and seeded conformance corpus.",
+            "A replayable evidence packet with hashes and minimized divergence."
+          ],
+          "constraints": [
+            "All execution has explicit instruction, memory, and input budgets.",
+            "Oracle and implementation share only the versioned architecture contract.",
+            "Unsupported encodings and programs fail closed inside emulation."
+          ],
+          "adversarial_cases": [
+            "out-of-range branch before write",
+            "byte arithmetic wrap",
+            "bad encoding after legal store"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic architecture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial program replays with precise committed state or fault."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared image and trace handoff directly."
+            }
+          ],
+          "handoff": "The CPU trace ABI becomes the target execution oracle.",
+          "safety": "Unknown target programs execute only inside bounded course emulators or an isolated comparison oracle."
+        },
+        {
+          "id": "H03.04",
+          "stars": 2,
+          "stage": "03",
+          "title": "CPU Mutant Tournament",
+          "slug": "cpu-mutant-tournament",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 30,
+          "prerequisites": [
+            "H03.03"
+          ],
+          "brief": "Kill ALU, sign-extension, PC, bounds, decode, and partial-commit mutants with minimized programs.",
+          "artifact": "mutation suite, minimized programs, and survivor analysis",
+          "deliverables": [
+            "A working mutation suite, minimized programs, and survivor analysis with reproducible instructions.",
+            "An independently structured oracle and seeded conformance corpus.",
+            "A replayable evidence packet with hashes and minimized divergence."
+          ],
+          "constraints": [
+            "All execution has explicit instruction, memory, and input budgets.",
+            "Oracle and implementation share only the versioned architecture contract.",
+            "Unsupported encodings and programs fail closed inside emulation."
+          ],
+          "adversarial_cases": [
+            "zero-extended branch",
+            "PC advanced after halt",
+            "write before memory fault"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic architecture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial program replays with precise committed state or fault."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared image and trace handoff directly."
+            }
+          ],
+          "handoff": "The corpus becomes architectural regression evidence.",
+          "safety": "Unknown target programs execute only inside bounded course emulators or an isolated comparison oracle."
+        },
+        {
+          "id": "H03.05",
+          "stars": 2,
+          "stage": "03",
+          "title": "Reverse-Time Debugger",
+          "slug": "reverse-time-debugger",
+          "lane": "construction",
+          "difficulty": "brutal",
+          "estimated_hours": 32,
+          "prerequisites": [
+            "03.02",
+            "H03.03"
+          ],
+          "brief": "Implement checkpoints, reverse-step, watchpoint search, and first-divergence navigation.",
+          "artifact": "reversible debugger, checkpoint format, and query transcript",
+          "deliverables": [
+            "A working reversible debugger, checkpoint format, and query transcript with reproducible instructions.",
+            "An independently structured oracle and seeded conformance corpus.",
+            "A replayable evidence packet with hashes and minimized divergence."
+          ],
+          "constraints": [
+            "All execution has explicit instruction, memory, and input budgets.",
+            "Oracle and implementation share only the versioned architecture contract.",
+            "Unsupported encodings and programs fail closed inside emulation."
+          ],
+          "adversarial_cases": [
+            "reverse across store",
+            "search repeated loop states",
+            "fault with no committed writes"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic architecture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial program replays with precise committed state or fault."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared image and trace handoff directly."
+            }
+          ],
+          "handoff": "The debugger is reused for compiler and kernel divergence.",
+          "safety": "Unknown target programs execute only inside bounded course emulators or an isolated comparison oracle."
+        },
+        {
+          "id": "H03.06",
+          "stars": 2,
+          "stage": "03",
+          "title": "Architecture Compatibility Island",
+          "slug": "architecture-compatibility-island",
+          "lane": "construction",
+          "difficulty": "brutal",
+          "estimated_hours": 44,
+          "prerequisites": [
+            "03.02",
+            "H03.03"
+          ],
+          "brief": "Implement a bounded ARMv4T A32 or approved RV32I subset behind the same trace ABI and compare an independent emulator.",
+          "artifact": "subset specification, executor, cross-assembled fixtures, and differential report",
+          "deliverables": [
+            "A working subset specification, executor, cross-assembled fixtures, and differential report with reproducible instructions.",
+            "An independently structured oracle and seeded conformance corpus.",
+            "A replayable evidence packet with hashes and minimized divergence."
+          ],
+          "constraints": [
+            "All execution has explicit instruction, memory, and input budgets.",
+            "Oracle and implementation share only the versioned architecture contract.",
+            "Unsupported encodings and programs fail closed inside emulation."
+          ],
+          "adversarial_cases": [
+            "condition-code boundary",
+            "unsupported alignment",
+            "valid instruction outside subset"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic architecture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial program replays with precise committed state or fault."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared image and trace handoff directly."
+            }
+          ],
+          "handoff": "The adapter proves later interfaces are architecture contracts.",
+          "safety": "Unknown target programs execute only inside bounded course emulators or an isolated comparison oracle."
+        },
+        {
+          "id": "H03.07",
+          "stars": 2,
+          "stage": "03",
+          "title": "Hostile ROM Monitor",
+          "slug": "hostile-rom-monitor",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 30,
+          "prerequisites": [
+            "03.03",
+            "H02.08",
+            "H03.03"
+          ],
+          "brief": "Implement a range-checked checksummed monitor recovering from arbitrary serial byte loss.",
+          "artifact": "monitor image, host sender, split corpus, and boot transcript",
+          "deliverables": [
+            "A working monitor image, host sender, split corpus, and boot transcript with reproducible instructions.",
+            "An independently structured oracle and seeded conformance corpus.",
+            "A replayable evidence packet with hashes and minimized divergence."
+          ],
+          "constraints": [
+            "All execution has explicit instruction, memory, and input budgets.",
+            "Oracle and implementation share only the versioned architecture contract.",
+            "Unsupported encodings and programs fail closed inside emulation."
+          ],
+          "adversarial_cases": [
+            "dropped byte in each position",
+            "valid checksum with bad destination",
+            "reset before jump"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic architecture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial program replays with precise committed state or fault."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared image and trace handoff directly."
+            }
+          ],
+          "handoff": "The monitor becomes the trusted later boot transport.",
+          "safety": "Unknown target programs execute only inside bounded course emulators or an isolated comparison oracle."
+        },
+        {
+          "id": "H03.08",
+          "stars": 3,
+          "stage": "03",
+          "title": "Boss: Mystery Cartridge",
+          "slug": "boss-mystery-cartridge",
+          "lane": "boss",
+          "difficulty": "brutal",
+          "estimated_hours": 42,
+          "prerequisites": [
+            "H03.04",
+            "H03.05",
+            "H03.07"
+          ],
+          "brief": "Reverse an unknown ROM, diagnose its logic flaw, patch it, upload through the monitor, and prove the repair.",
+          "artifact": "annotated ROM, patch, uploaded image, and before-after trace",
+          "deliverables": [
+            "A working annotated ROM, patch, uploaded image, and before-after trace with reproducible instructions.",
+            "An independently structured oracle and seeded conformance corpus.",
+            "A replayable evidence packet with hashes and minimized divergence."
+          ],
+          "constraints": [
+            "All execution has explicit instruction, memory, and input budgets.",
+            "Oracle and implementation share only the versioned architecture contract.",
+            "Unsupported encodings and programs fail closed inside emulation."
+          ],
+          "adversarial_cases": [
+            "misleading dead code",
+            "data resembling instructions",
+            "late symptom of wrong branch"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic architecture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial program replays with precise committed state or fault."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared image and trace handoff directly."
+            }
+          ],
+          "handoff": "The repaired image, isa-v1, debugger, and corpus pass to the compiler stage.",
+          "safety": "Unknown target programs execute only inside bounded course emulators or an isolated comparison oracle."
+        }
+      ]
+    },
+    {
+      "id": "04",
+      "slug": "self-surviving-toolchain",
+      "title": "Toolchain That Must Survive Itself",
+      "path": "vault/Challenges/04 Toolchain That Must Survive Itself.md",
+      "overview": "Drive C0 source through parsing, semantics, ABI, ELF, runtime allocation, packet ownership, and hostile network boot.",
+      "entry_gate": "Complete modules 04.01 through 04.05, gate-04, and the H03 ISA and monitor handoff.",
+      "stage_handoff": "A reproducible C0 toolchain, target ABI, ELF profile, runtime, NIC contract, and boot bundle.",
+      "safety": "Network tests use packet fixtures or loopback; target images run only in the course machine.",
+      "sources": [
+        {
+          "title": "LLVM frontend tutorial",
+          "url": "https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/",
+          "use": "Structure lexing, parsing, ASTs, code generation, and staged language growth."
+        },
+        {
+          "title": "System V ABI ELF PDF",
+          "url": "https://gabi.xinuos.com/elf.pdf",
+          "use": "Define sections, symbols, relocations, segments, and loading evidence."
+        },
+        {
+          "title": "Linux DMA mapping guide",
+          "url": "https://docs.kernel.org/core-api/dma-api-howto.html",
+          "use": "Ground packet-buffer ownership and device visibility transitions."
+        },
+        {
+          "title": "RFC 1350 TFTP",
+          "url": "https://www.rfc-editor.org/rfc/rfc1350.html",
+          "use": "Study a small transfer protocol's blocks, timeouts, duplicates, and errors."
+        }
+      ],
+      "challenges": [
+        {
+          "id": "H04.01",
+          "stars": 1,
+          "stage": "04",
+          "title": "Lexer Minefield",
+          "slug": "lexer-minefield",
+          "lane": "adversary",
+          "difficulty": "very hard",
+          "estimated_hours": 22,
+          "prerequisites": [
+            "04.01",
+            "H00.06",
+            "H03.08"
+          ],
+          "brief": "Build a C0 lexer and parser with stable spans that consumes all input or returns one precise error.",
+          "artifact": "lexer-parser, grammar generator, AST serializer, and diagnostics",
+          "deliverables": [
+            "A working lexer-parser, grammar generator, AST serializer, and diagnostics with reproducible instructions.",
+            "An independent semantic or byte-level oracle plus seeded faults.",
+            "A replayable evidence packet linking source through target effects."
+          ],
+          "constraints": [
+            "All builds and transfers are offline, deterministic, and bounded.",
+            "Each layer retains an independent oracle at its declared interface.",
+            "No target image executes before complete range and integrity validation."
+          ],
+          "adversarial_cases": [
+            "unterminated nesting",
+            "oversized integer",
+            "valid prefix with ambiguous token"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic source, object, and target checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a precise bounded failure or matching result."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared ABI, image, and device handoff directly."
+            }
+          ],
+          "handoff": "The typed AST wire form feeds semantic and code-generation models.",
+          "safety": "Network tests use packet fixtures or loopback; target images run only in the course machine."
+        },
+        {
+          "id": "H04.02",
+          "stars": 1,
+          "stage": "04",
+          "title": "Semantic Doppelganger",
+          "slug": "semantic-doppelganger",
+          "lane": "integration",
+          "difficulty": "brutal",
+          "estimated_hours": 38,
+          "prerequisites": [
+            "04.01",
+            "H03.03",
+            "H04.01"
+          ],
+          "brief": "Compare an AST interpreter with generated target code for thousands of defined C0 programs.",
+          "artifact": "interpreter, code generator, program generator, and corpus",
+          "deliverables": [
+            "A working interpreter, code generator, program generator, and corpus with reproducible instructions.",
+            "An independent semantic or byte-level oracle plus seeded faults.",
+            "A replayable evidence packet linking source through target effects."
+          ],
+          "constraints": [
+            "All builds and transfers are offline, deterministic, and bounded.",
+            "Each layer retains an independent oracle at its declared interface.",
+            "No target image executes before complete range and integrity validation."
+          ],
+          "adversarial_cases": [
+            "untaken faulting arm",
+            "target versus host arithmetic",
+            "maximum call depth"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic source, object, and target checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a precise bounded failure or matching result."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared ABI, image, and device handoff directly."
+            }
+          ],
+          "handoff": "The proven lowering rules become the compiler contract.",
+          "safety": "Network tests use packet fixtures or loopback; target images run only in the course machine."
+        },
+        {
+          "id": "H04.03",
+          "stars": 2,
+          "stage": "04",
+          "title": "Miscompilation Reducer",
+          "slug": "miscompilation-reducer",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 28,
+          "prerequisites": [
+            "H04.02"
+          ],
+          "brief": "Find the first wrong lowering in compiler mutants and reduce each program while preserving mismatch.",
+          "artifact": "compiler trace mapper, reducer, and regressions",
+          "deliverables": [
+            "A working compiler trace mapper, reducer, and regressions with reproducible instructions.",
+            "An independent semantic or byte-level oracle plus seeded faults.",
+            "A replayable evidence packet linking source through target effects."
+          ],
+          "constraints": [
+            "All builds and transfers are offline, deterministic, and bounded.",
+            "Each layer retains an independent oracle at its declared interface.",
+            "No target image executes before complete range and integrity validation."
+          ],
+          "adversarial_cases": [
+            "wrong evaluation order",
+            "spill reloaded at wrong width",
+            "branch fixed before final size"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic source, object, and target checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a precise bounded failure or matching result."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared ABI, image, and device handoff directly."
+            }
+          ],
+          "handoff": "Minimal cases enter the permanent compiler corpus.",
+          "safety": "Network tests use packet fixtures or loopback; target images run only in the course machine."
+        },
+        {
+          "id": "H04.04",
+          "stars": 2,
+          "stage": "04",
+          "title": "ABI Ordeal",
+          "slug": "abi-ordeal",
+          "lane": "construction",
+          "difficulty": "brutal",
+          "estimated_hours": 30,
+          "prerequisites": [
+            "00.07",
+            "H03.05",
+            "H04.02"
+          ],
+          "brief": "Prove the target calling convention across separate compilation, recursion, spills, and startup.",
+          "artifact": "ABI specification, conformance programs, startup object, and checker",
+          "deliverables": [
+            "A working ABI specification, conformance programs, startup object, and checker with reproducible instructions.",
+            "An independent semantic or byte-level oracle plus seeded faults.",
+            "A replayable evidence packet linking source through target effects."
+          ],
+          "constraints": [
+            "All builds and transfers are offline, deterministic, and bounded.",
+            "Each layer retains an independent oracle at its declared interface.",
+            "No target image executes before complete range and integrity validation."
+          ],
+          "adversarial_cases": [
+            "callee-save pressure",
+            "deep stack alignment",
+            "clobber after nested call"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic source, object, and target checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a precise bounded failure or matching result."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared ABI, image, and device handoff directly."
+            }
+          ],
+          "handoff": "The ABI and startup object become linker and kernel inputs.",
+          "safety": "Network tests use packet fixtures or loopback; target images run only in the course machine."
+        },
+        {
+          "id": "H04.05",
+          "stars": 2,
+          "stage": "04",
+          "title": "Linker Labyrinth",
+          "slug": "linker-labyrinth",
+          "lane": "construction",
+          "difficulty": "brutal",
+          "estimated_hours": 38,
+          "prerequisites": [
+            "04.02",
+            "H00.02",
+            "H04.04"
+          ],
+          "brief": "Lay out objects, resolve symbols, apply checked relocations, and emit deterministic ELF.",
+          "artifact": "static linker, ELF inspector, relocation oracle, and malformed corpus",
+          "deliverables": [
+            "A working static linker, ELF inspector, relocation oracle, and malformed corpus with reproducible instructions.",
+            "An independent semantic or byte-level oracle plus seeded faults.",
+            "A replayable evidence packet linking source through target effects."
+          ],
+          "constraints": [
+            "All builds and transfers are offline, deterministic, and bounded.",
+            "Each layer retains an independent oracle at its declared interface.",
+            "No target image executes before complete range and integrity validation."
+          ],
+          "adversarial_cases": [
+            "duplicate strong symbol",
+            "relocation overflow",
+            "alignment changing relative relocation"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic source, object, and target checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a precise bounded failure or matching result."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared ABI, image, and device handoff directly."
+            }
+          ],
+          "handoff": "The ELF profile and map become the OS load contract.",
+          "safety": "Network tests use packet fixtures or loopback; target images run only in the course machine."
+        },
+        {
+          "id": "H04.06",
+          "stars": 2,
+          "stage": "04",
+          "title": "Allocator Chaos",
+          "slug": "allocator-chaos",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 34,
+          "prerequisites": [
+            "04.03",
+            "H00.03",
+            "H04.04"
+          ],
+          "brief": "Implement free-list split, ordered insertion, coalescing, and invariant checks after generated operations.",
+          "artifact": "allocator, heap oracle, fail schedule, and heap dump",
+          "deliverables": [
+            "A working allocator, heap oracle, fail schedule, and heap dump with reproducible instructions.",
+            "An independent semantic or byte-level oracle plus seeded faults.",
+            "A replayable evidence packet linking source through target effects."
+          ],
+          "constraints": [
+            "All builds and transfers are offline, deterministic, and bounded.",
+            "Each layer retains an independent oracle at its declared interface.",
+            "No target image executes before complete range and integrity validation."
+          ],
+          "adversarial_cases": [
+            "reverse adjacent frees",
+            "failure after split decision",
+            "alignment exhausting arena"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic source, object, and target checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a precise bounded failure or matching result."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared ABI, image, and device handoff directly."
+            }
+          ],
+          "handoff": "Allocator and byte routines form the target runtime.",
+          "safety": "Network tests use packet fixtures or loopback; target images run only in the course machine."
+        },
+        {
+          "id": "H04.07",
+          "stars": 2,
+          "stage": "04",
+          "title": "Treacherous NIC and Loader",
+          "slug": "treacherous-nic-and-loader",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 38,
+          "prerequisites": [
+            "04.04",
+            "04.05",
+            "H02.05",
+            "H04.05",
+            "H04.06"
+          ],
+          "brief": "Compose MMIO packet rings with a loader surviving loss, duplication, reordering, and truncation.",
+          "artifact": "NIC model, driver, image protocol, loader, and transcript",
+          "deliverables": [
+            "A working NIC model, driver, image protocol, loader, and transcript with reproducible instructions.",
+            "An independent semantic or byte-level oracle plus seeded faults.",
+            "A replayable evidence packet linking source through target effects."
+          ],
+          "constraints": [
+            "All builds and transfers are offline, deterministic, and bounded.",
+            "Each layer retains an independent oracle at its declared interface.",
+            "No target image executes before complete range and integrity validation."
+          ],
+          "adversarial_cases": [
+            "ownership changes during retry",
+            "duplicate final packet",
+            "checksum with overlapping range"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic source, object, and target checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a precise bounded failure or matching result."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared ABI, image, and device handoff directly."
+            }
+          ],
+          "handoff": "NIC and boot-bundle contracts become kernel inputs.",
+          "safety": "Network tests use packet fixtures or loopback; target images run only in the course machine."
+        },
+        {
+          "id": "H04.08",
+          "stars": 3,
+          "stage": "04",
+          "title": "Boss: Source to Packet Boot",
+          "slug": "boss-source-to-packet-boot",
+          "lane": "boss",
+          "difficulty": "brutal",
+          "estimated_hours": 50,
+          "prerequisites": [
+            "H04.03",
+            "H04.04",
+            "H04.05",
+            "H04.06",
+            "H04.07"
+          ],
+          "brief": "Compile multi-file C0, link, package, transfer through the faulting NIC, boot, and emit UART proof.",
+          "artifact": "reproducible toolchain, boot bundle, runner, and boundary ledger",
+          "deliverables": [
+            "A working reproducible toolchain, boot bundle, runner, and boundary ledger with reproducible instructions.",
+            "An independent semantic or byte-level oracle plus seeded faults.",
+            "A replayable evidence packet linking source through target effects."
+          ],
+          "constraints": [
+            "All builds and transfers are offline, deterministic, and bounded.",
+            "Each layer retains an independent oracle at its declared interface.",
+            "No target image executes before complete range and integrity validation."
+          ],
+          "adversarial_cases": [
+            "compiler mutant visible on target",
+            "reordered transfer packet",
+            "allocator exhaustion during output"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic source, object, and target checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial case replays as a precise bounded failure or matching result."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared ABI, image, and device handoff directly."
+            }
+          ],
+          "handoff": "Toolchain, ABI, runtime, bundle, and NIC trace pass to kernel work.",
+          "safety": "Network tests use packet fixtures or loopback; target images run only in the course machine."
+        }
+      ]
+    },
+    {
+      "id": "05",
+      "slug": "kernel-storage-failure-lab",
+      "title": "Kernel and Storage Failure Laboratory",
+      "path": "vault/Challenges/05 Kernel and Storage Failure Laboratory.md",
+      "overview": "Attack translation, privilege, traps, scheduling, partial I/O, persistence, and FAT until a multiprocess machine reboots explainably.",
+      "entry_gate": "Complete modules 05.01 through 05.05, gate-05, and boot the H04 bundle.",
+      "stage_handoff": "A syscall ABI, deterministic kernel trace, kernel ELF, disposable root image, and power-failure corpus.",
+      "safety": "Storage campaigns use disposable image copies only; never open host block devices.",
+      "sources": [
+        {
+          "title": "RISC-V supervisor ISA",
+          "url": "https://docs.riscv.org/reference/isa/priv/supervisor.html",
+          "use": "Ground translation, privilege, traps, faults, and invalidation in a precise contract."
+        },
+        {
+          "title": "Virtio 1.3 block specification",
+          "url": "https://docs.oasis-open.org/virtio/virtio/v1.3/virtio-v1.3.html",
+          "use": "Define bounded request, completion, status, and ownership behavior."
+        },
+        {
+          "title": "POSIX exec specification",
+          "url": "https://pubs.opengroup.org/onlinepubs/9799919799/functions/exec.html",
+          "use": "Scope process replacement, descriptors, arguments, and failure behavior."
+        },
+        {
+          "title": "ECMA-107 filesystem standard",
+          "url": "https://ecma-international.org/publications-and-standards/standards/ecma-107/",
+          "use": "Compare official disk structures with the bounded FAT reasoning."
+        }
+      ],
+      "challenges": [
+        {
+          "id": "H05.01",
+          "stars": 1,
+          "stage": "05",
+          "title": "Page-Walk Doppelganger",
+          "slug": "page-walk-doppelganger",
+          "lane": "integration",
+          "difficulty": "brutal",
+          "estimated_hours": 34,
+          "prerequisites": [
+            "05.01",
+            "H03.03",
+            "H04.08"
+          ],
+          "brief": "Compare a pure page walk with a bounded TLB over generated mappings, permissions, and malformed entries.",
+          "artifact": "reference walker, TLB path, table generator, and trace",
+          "deliverables": [
+            "A working reference walker, TLB path, table generator, and trace with reproducible instructions.",
+            "An independent state or storage oracle plus seeded fault schedules.",
+            "A replayable evidence packet with full event and durability traces."
+          ],
+          "constraints": [
+            "All execution and I/O are deterministic and explicitly bounded.",
+            "Kernel boundaries validate user and disk bytes before mutation.",
+            "Disk tests operate only on fresh disposable image copies."
+          ],
+          "adversarial_cases": [
+            "present page denying access",
+            "malformed nonleaf",
+            "offset-preservation edge"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic isolation and persistence checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays with precise state, fault, or durability evidence."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared kernel and root-image handoff directly."
+            }
+          ],
+          "handoff": "Translation and fault schemas become the kernel memory boundary.",
+          "safety": "Storage campaigns use disposable image copies only; never open host block devices."
+        },
+        {
+          "id": "H05.02",
+          "stars": 1,
+          "stage": "05",
+          "title": "Stale-Translation Escape",
+          "slug": "stale-translation-escape",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 30,
+          "prerequisites": [
+            "05.01",
+            "H05.01"
+          ],
+          "brief": "Attack stale TLB entries through remap, permission downgrade, ASID reuse, and invalidation schedules.",
+          "artifact": "invalidation model, attack scheduler, and minimized corpus",
+          "deliverables": [
+            "A working invalidation model, attack scheduler, and minimized corpus with reproducible instructions.",
+            "An independent state or storage oracle plus seeded fault schedules.",
+            "A replayable evidence packet with full event and durability traces."
+          ],
+          "constraints": [
+            "All execution and I/O are deterministic and explicitly bounded.",
+            "Kernel boundaries validate user and disk bytes before mutation.",
+            "Disk tests operate only on fresh disposable image copies."
+          ],
+          "adversarial_cases": [
+            "permission removed without flush",
+            "ASID reused",
+            "one page remapped while another stays hot"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic isolation and persistence checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays with precise state, fault, or durability evidence."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared kernel and root-image handoff directly."
+            }
+          ],
+          "handoff": "The invalidation protocol becomes a context-switch assertion.",
+          "safety": "Storage campaigns use disposable image copies only; never open host block devices."
+        },
+        {
+          "id": "H05.03",
+          "stars": 2,
+          "stage": "05",
+          "title": "Hostile Exec and Syscall Boundary",
+          "slug": "hostile-exec-and-syscall-boundary",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 38,
+          "prerequisites": [
+            "05.02",
+            "H04.05",
+            "H05.01"
+          ],
+          "brief": "Load hostile ELF and validate user buffers spanning pages with precise fault atomicity.",
+          "artifact": "ELF loader, user-copy layer, malformed corpus, and fault ledger",
+          "deliverables": [
+            "A working ELF loader, user-copy layer, malformed corpus, and fault ledger with reproducible instructions.",
+            "An independent state or storage oracle plus seeded fault schedules.",
+            "A replayable evidence packet with full event and durability traces."
+          ],
+          "constraints": [
+            "All execution and I/O are deterministic and explicitly bounded.",
+            "Kernel boundaries validate user and disk bytes before mutation.",
+            "Disk tests operate only on fresh disposable image copies."
+          ],
+          "adversarial_cases": [
+            "segment range wrap",
+            "buffer ending on absent page",
+            "overlapping incompatible segments"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic isolation and persistence checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays with precise state, fault, or durability evidence."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared kernel and root-image handoff directly."
+            }
+          ],
+          "handoff": "Loader and user-copy rules become the syscall boundary.",
+          "safety": "Storage campaigns use disposable image copies only; never open host block devices."
+        },
+        {
+          "id": "H05.04",
+          "stars": 2,
+          "stage": "05",
+          "title": "Trap and Scheduler Replay",
+          "slug": "trap-and-scheduler-replay",
+          "lane": "integration",
+          "difficulty": "brutal",
+          "estimated_hours": 42,
+          "prerequisites": [
+            "05.02",
+            "H03.05",
+            "H05.02",
+            "H05.03"
+          ],
+          "brief": "Record traps, switches, address spaces, and wakeups so seeded preemption replays identically.",
+          "artifact": "scheduler, event log, replay engine, and lost-wakeup mutant",
+          "deliverables": [
+            "A working scheduler, event log, replay engine, and lost-wakeup mutant with reproducible instructions.",
+            "An independent state or storage oracle plus seeded fault schedules.",
+            "A replayable evidence packet with full event and durability traces."
+          ],
+          "constraints": [
+            "All execution and I/O are deterministic and explicitly bounded.",
+            "Kernel boundaries validate user and disk bytes before mutation.",
+            "Disk tests operate only on fresh disposable image copies."
+          ],
+          "adversarial_cases": [
+            "preemption during copy",
+            "child exit beside wait",
+            "switch with hot TLB"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic isolation and persistence checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays with precise state, fault, or durability evidence."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared kernel and root-image handoff directly."
+            }
+          ],
+          "handoff": "The event schema becomes the process investigation trace.",
+          "safety": "Storage campaigns use disposable image copies only; never open host block devices."
+        },
+        {
+          "id": "H05.05",
+          "stars": 2,
+          "stage": "05",
+          "title": "Partial-I-O State Machine",
+          "slug": "partial-i-o-state-machine",
+          "lane": "adversary",
+          "difficulty": "very hard",
+          "estimated_hours": 30,
+          "prerequisites": [
+            "05.02",
+            "H05.03",
+            "H05.04"
+          ],
+          "brief": "Implement read, write, pipe, wait, and close under short progress, interruption, exit, and descriptor reuse.",
+          "artifact": "syscall state machines, process scripts, and leak report",
+          "deliverables": [
+            "A working syscall state machines, process scripts, and leak report with reproducible instructions.",
+            "An independent state or storage oracle plus seeded fault schedules.",
+            "A replayable evidence packet with full event and durability traces."
+          ],
+          "constraints": [
+            "All execution and I/O are deterministic and explicitly bounded.",
+            "Kernel boundaries validate user and disk bytes before mutation.",
+            "Disk tests operate only on fresh disposable image copies."
+          ],
+          "adversarial_cases": [
+            "short write then exit",
+            "reader with final writer gone",
+            "descriptor reused after interruption"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic isolation and persistence checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays with precise state, fault, or durability evidence."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared kernel and root-image handoff directly."
+            }
+          ],
+          "handoff": "The syscall ABI feeds shell, Telnet, and browser processes.",
+          "safety": "Storage campaigns use disposable image copies only; never open host block devices."
+        },
+        {
+          "id": "H05.06",
+          "stars": 2,
+          "stage": "05",
+          "title": "Power-Cut Block Device",
+          "slug": "power-cut-block-device",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 36,
+          "prerequisites": [
+            "05.03",
+            "H04.07"
+          ],
+          "brief": "Inject timeout, torn write, reorder, short completion, and crash at every sector operation.",
+          "artifact": "file-backed device, fault scheduler, replay log, and durability model",
+          "deliverables": [
+            "A working file-backed device, fault scheduler, replay log, and durability model with reproducible instructions.",
+            "An independent state or storage oracle plus seeded fault schedules.",
+            "A replayable evidence packet with full event and durability traces."
+          ],
+          "constraints": [
+            "All execution and I/O are deterministic and explicitly bounded.",
+            "Kernel boundaries validate user and disk bytes before mutation.",
+            "Disk tests operate only on fresh disposable image copies."
+          ],
+          "adversarial_cases": [
+            "half-sector persists",
+            "writes reach media reversed",
+            "crash between metadata and data"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic isolation and persistence checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays with precise state, fault, or durability evidence."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared kernel and root-image handoff directly."
+            }
+          ],
+          "handoff": "The block API and crash corpus become the FAT storage contract.",
+          "safety": "Storage campaigns use disposable image copies only; never open host block devices."
+        },
+        {
+          "id": "H05.07",
+          "stars": 2,
+          "stage": "05",
+          "title": "FAT Forensic Recovery",
+          "slug": "fat-forensic-recovery",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 36,
+          "prerequisites": [
+            "05.04",
+            "H00.01",
+            "H05.06"
+          ],
+          "brief": "Diagnose loops, cross-links, lost clusters, and torn directories, recovering files only to a new image.",
+          "artifact": "FAT checker, forensic report, recovered image, and host transcript",
+          "deliverables": [
+            "A working FAT checker, forensic report, recovered image, and host transcript with reproducible instructions.",
+            "An independent state or storage oracle plus seeded fault schedules.",
+            "A replayable evidence packet with full event and durability traces."
+          ],
+          "constraints": [
+            "All execution and I/O are deterministic and explicitly bounded.",
+            "Kernel boundaries validate user and disk bytes before mutation.",
+            "Disk tests operate only on fresh disposable image copies."
+          ],
+          "adversarial_cases": [
+            "cyclic cluster chain",
+            "two files share cluster",
+            "inconsistent LFN sequence"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic isolation and persistence checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays with precise state, fault, or durability evidence."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared kernel and root-image handoff directly."
+            }
+          ],
+          "handoff": "The verified root image becomes persistent user-space input.",
+          "safety": "Storage campaigns use disposable image copies only; never open host block devices."
+        },
+        {
+          "id": "H05.08",
+          "stars": 3,
+          "stage": "05",
+          "title": "Boss: Persistent Multiprocess Machine",
+          "slug": "boss-persistent-multiprocess-machine",
+          "lane": "boss",
+          "difficulty": "brutal",
+          "estimated_hours": 56,
+          "prerequisites": [
+            "H05.02",
+            "H05.03",
+            "H05.04",
+            "H05.05",
+            "H05.06",
+            "H05.07"
+          ],
+          "brief": "Boot, run a fork-exec pipeline, persist a file, inject a block fault, reboot, and explain surviving state.",
+          "artifact": "kernel ELF, root image, session, reboot trace, and ledger",
+          "deliverables": [
+            "A working kernel ELF, root image, session, reboot trace, and ledger with reproducible instructions.",
+            "An independent state or storage oracle plus seeded fault schedules.",
+            "A replayable evidence packet with full event and durability traces."
+          ],
+          "constraints": [
+            "All execution and I/O are deterministic and explicitly bounded.",
+            "Kernel boundaries validate user and disk bytes before mutation.",
+            "Disk tests operate only on fresh disposable image copies."
+          ],
+          "adversarial_cases": [
+            "process fault during write",
+            "metadata block timeout",
+            "stale-TLB mutant on reboot"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic isolation and persistence checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial schedule replays with precise state, fault, or durability evidence."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the declared kernel and root-image handoff directly."
+            }
+          ],
+          "handoff": "Kernel, syscall ABI, trace, and root image pass to networking.",
+          "safety": "Storage campaigns use disposable image copies only; never open host block devices."
+        }
+      ]
+    },
+    {
+      "id": "06",
+      "slug": "adversarial-network-browser",
+      "title": "Network and Browser in an Adversarial Box",
+      "path": "vault/Challenges/06 Network and Browser in an Adversarial Box.md",
+      "overview": "Reverse packet histories, attack TCP and process lifecycles, seal mappings, and fuzz HTTP and HTML before composing a hostile local Web.",
+      "entry_gate": "Complete modules 06.01 through 06.04, gate-06, and the H05 persistent-machine handoff.",
+      "stage_handoff": "A network adversary, TCP corpus, optional sealed loader, browser image, and packet-to-render trace.",
+      "safety": "All services use loopback or simulation; no public bind shell, Internet traffic, TLS claim, or terminal injection.",
+      "sources": [
+        {
+          "title": "RFC 9293 TCP",
+          "url": "https://www.rfc-editor.org/rfc/rfc9293.html",
+          "use": "Define sequence, acknowledgement, retransmission, state, and close invariants."
+        },
+        {
+          "title": "RFC 854 Telnet",
+          "url": "https://www.rfc-editor.org/rfc/rfc854.html",
+          "use": "Bound negotiation and explain why the exercise remains loopback-only."
+        },
+        {
+          "title": "RFC 9112 HTTP/1.1",
+          "url": "https://www.rfc-editor.org/rfc/rfc9112.html",
+          "use": "Specify framing and split-point invariance before HTML parsing."
+        },
+        {
+          "title": "WHATWG HTML parsing",
+          "url": "https://html.spec.whatwg.org/multipage/parsing.html",
+          "use": "Select tokenizer behavior and document bounded-subset differences."
+        }
+      ],
+      "challenges": [
+        {
+          "id": "H06.01",
+          "stars": 1,
+          "stage": "06",
+          "title": "PCAP Archaeology",
+          "slug": "pcap-archaeology",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 26,
+          "prerequisites": [
+            "06.01",
+            "H04.07",
+            "H05.08"
+          ],
+          "brief": "Reconstruct a missing TCP state transition and bug from packet captures without source access.",
+          "artifact": "packet decoder, state timeline, hypothesis table, and witness",
+          "deliverables": [
+            "A working packet decoder, state timeline, hypothesis table, and witness with reproducible instructions.",
+            "An independent protocol or parser oracle plus seeded faults.",
+            "A replayable packet-to-process-to-render evidence packet."
+          ],
+          "constraints": [
+            "All required networking is loopback or deterministic simulation.",
+            "Protocol and parser queues, states, inputs, and outputs are bounded.",
+            "Content bytes never become unescaped terminal control sequences."
+          ],
+          "adversarial_cases": [
+            "retransmission mistaken for new data",
+            "duplicate ACK after reorder",
+            "reset trigger absent from capture"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic protocol and parser checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial packet or byte split replays without a crash, hang, or leak."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the browser and trace handoff directly."
+            }
+          ],
+          "handoff": "The inferred timeline becomes the TCP differential trace.",
+          "safety": "All services use loopback or simulation; no public bind shell, Internet traffic, TLS claim, or terminal injection."
+        },
+        {
+          "id": "H06.02",
+          "stars": 1,
+          "stage": "06",
+          "title": "Packet Adversary",
+          "slug": "packet-adversary",
+          "lane": "adversary",
+          "difficulty": "very hard",
+          "estimated_hours": 24,
+          "prerequisites": [
+            "06.01",
+            "H05.04"
+          ],
+          "brief": "Build a deterministic link that loses, duplicates, delays, reorders, corrupts, and fragments packets.",
+          "artifact": "bounded link simulator, schedule language, and fault corpus",
+          "deliverables": [
+            "A working bounded link simulator, schedule language, and fault corpus with reproducible instructions.",
+            "An independent protocol or parser oracle plus seeded faults.",
+            "A replayable packet-to-process-to-render evidence packet."
+          ],
+          "constraints": [
+            "All required networking is loopback or deterministic simulation.",
+            "Protocol and parser queues, states, inputs, and outputs are bounded.",
+            "Content bytes never become unescaped terminal control sequences."
+          ],
+          "adversarial_cases": [
+            "every third packet duplicated",
+            "adjacent packets reversed",
+            "fragment dropped until retry"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic protocol and parser checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial packet or byte split replays without a crash, hang, or leak."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the browser and trace handoff directly."
+            }
+          ],
+          "handoff": "The virtual link becomes the required TCP transport.",
+          "safety": "All services use loopback or simulation; no public bind shell, Internet traffic, TLS claim, or terminal injection."
+        },
+        {
+          "id": "H06.03",
+          "stars": 2,
+          "stage": "06",
+          "title": "TCP Wraparound and Close Storm",
+          "slug": "tcp-wraparound-and-close-storm",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 44,
+          "prerequisites": [
+            "H06.01",
+            "H06.02"
+          ],
+          "brief": "Maintain scoped TCP invariants through wraparound, retransmission, duplicate ACKs, and simultaneous close.",
+          "artifact": "TCP machine, sequence oracle, schedule corpus, and leak report",
+          "deliverables": [
+            "A working TCP machine, sequence oracle, schedule corpus, and leak report with reproducible instructions.",
+            "An independent protocol or parser oracle plus seeded faults.",
+            "A replayable packet-to-process-to-render evidence packet."
+          ],
+          "constraints": [
+            "All required networking is loopback or deterministic simulation.",
+            "Protocol and parser queues, states, inputs, and outputs are bounded.",
+            "Content bytes never become unescaped terminal control sequences."
+          ],
+          "adversarial_cases": [
+            "sequence wrap",
+            "simultaneous close",
+            "old duplicate in window"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic protocol and parser checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial packet or byte split replays without a crash, hang, or leak."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the browser and trace handoff directly."
+            }
+          ],
+          "handoff": "The endpoint and corpus become socket services.",
+          "safety": "All services use loopback or simulation; no public bind shell, Internet traffic, TLS claim, or terminal injection."
+        },
+        {
+          "id": "H06.04",
+          "stars": 2,
+          "stage": "06",
+          "title": "Multi-client Telnet Lifecycle",
+          "slug": "multi-client-telnet-lifecycle",
+          "lane": "integration",
+          "difficulty": "brutal",
+          "estimated_hours": 32,
+          "prerequisites": [
+            "06.02",
+            "H05.05",
+            "H06.03"
+          ],
+          "brief": "Serve loopback shell sessions while clients disconnect, children exit, and descriptors recycle.",
+          "artifact": "Telnet service, clients, process trace, and cleanup audit",
+          "deliverables": [
+            "A working Telnet service, clients, process trace, and cleanup audit with reproducible instructions.",
+            "An independent protocol or parser oracle plus seeded faults.",
+            "A replayable packet-to-process-to-render evidence packet."
+          ],
+          "constraints": [
+            "All required networking is loopback or deterministic simulation.",
+            "Protocol and parser queues, states, inputs, and outputs are bounded.",
+            "Content bytes never become unescaped terminal control sequences."
+          ],
+          "adversarial_cases": [
+            "two clients close together",
+            "child exits with buffered output",
+            "descriptor reused after negotiation failure"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic protocol and parser checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial packet or byte split replays without a crash, hang, or leak."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the browser and trace handoff directly."
+            }
+          ],
+          "handoff": "The lifecycle tests validate sockets and processes.",
+          "safety": "All services use loopback or simulation; no public bind shell, Internet traffic, TLS claim, or terminal injection."
+        },
+        {
+          "id": "H06.05",
+          "stars": 2,
+          "stage": "06",
+          "title": "W-X Dynamic Loader",
+          "slug": "w-x-dynamic-loader",
+          "lane": "construction",
+          "difficulty": "brutal",
+          "estimated_hours": 38,
+          "prerequisites": [
+            "06.03",
+            "H04.05",
+            "H05.01"
+          ],
+          "brief": "Map one shared object, resolve approved imports, relocate, and seal permissions without writable-executable overlap.",
+          "artifact": "userspace loader, import policy, relocation oracle, and mapping trace",
+          "deliverables": [
+            "A working userspace loader, import policy, relocation oracle, and mapping trace with reproducible instructions.",
+            "An independent protocol or parser oracle plus seeded faults.",
+            "A replayable packet-to-process-to-render evidence packet."
+          ],
+          "constraints": [
+            "All required networking is loopback or deterministic simulation.",
+            "Protocol and parser queues, states, inputs, and outputs are bounded.",
+            "Content bytes never become unescaped terminal control sequences."
+          ],
+          "adversarial_cases": [
+            "unknown import",
+            "relocation overflow",
+            "text remains writable"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic protocol and parser checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial packet or byte split replays without a crash, hang, or leak."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the browser and trace handoff directly."
+            }
+          ],
+          "handoff": "The optional profile passes to the boss but never gates static linking.",
+          "safety": "All services use loopback or simulation; no public bind shell, Internet traffic, TLS claim, or terminal injection."
+        },
+        {
+          "id": "H06.06",
+          "stars": 2,
+          "stage": "06",
+          "title": "HTTP Split-Point Gauntlet",
+          "slug": "http-split-point-gauntlet",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 34,
+          "prerequisites": [
+            "06.04",
+            "H00.06",
+            "H06.03"
+          ],
+          "brief": "Prove an incremental HTTP parser returns identical results for every chunking of bounded fixtures.",
+          "artifact": "stream parser, all-split generator, framing corpus, and oracle",
+          "deliverables": [
+            "A working stream parser, all-split generator, framing corpus, and oracle with reproducible instructions.",
+            "An independent protocol or parser oracle plus seeded faults.",
+            "A replayable packet-to-process-to-render evidence packet."
+          ],
+          "constraints": [
+            "All required networking is loopback or deterministic simulation.",
+            "Protocol and parser queues, states, inputs, and outputs are bounded.",
+            "Content bytes never become unescaped terminal control sequences."
+          ],
+          "adversarial_cases": [
+            "terminator split",
+            "conflicting length",
+            "body one byte short"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic protocol and parser checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial packet or byte split replays without a crash, hang, or leak."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the browser and trace handoff directly."
+            }
+          ],
+          "handoff": "The parsed-message schema is the HTML layer's only input.",
+          "safety": "All services use loopback or simulation; no public bind shell, Internet traffic, TLS claim, or terminal injection."
+        },
+        {
+          "id": "H06.07",
+          "stars": 2,
+          "stage": "06",
+          "title": "Hostile Markup and Terminal",
+          "slug": "hostile-markup-and-terminal",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 38,
+          "prerequisites": [
+            "06.04",
+            "H06.06"
+          ],
+          "brief": "Grammar-fuzz HTML while proving progress, output limits, snapshots, and terminal-control escaping.",
+          "artifact": "tokenizer-renderer, grammar generator, snapshots, and minimized corpus",
+          "deliverables": [
+            "A working tokenizer-renderer, grammar generator, snapshots, and minimized corpus with reproducible instructions.",
+            "An independent protocol or parser oracle plus seeded faults.",
+            "A replayable packet-to-process-to-render evidence packet."
+          ],
+          "constraints": [
+            "All required networking is loopback or deterministic simulation.",
+            "Protocol and parser queues, states, inputs, and outputs are bounded.",
+            "Content bytes never become unescaped terminal control sequences."
+          ],
+          "adversarial_cases": [
+            "unclosed nesting",
+            "truncated entity",
+            "escape bytes in text"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic protocol and parser checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial packet or byte split replays without a crash, hang, or leak."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the browser and trace handoff directly."
+            }
+          ],
+          "handoff": "Renderer snapshots become browser evidence.",
+          "safety": "All services use loopback or simulation; no public bind shell, Internet traffic, TLS claim, or terminal injection."
+        },
+        {
+          "id": "H06.08",
+          "stars": 3,
+          "stage": "06",
+          "title": "Boss: Hostile Local Web",
+          "slug": "boss-hostile-local-web",
+          "lane": "boss",
+          "difficulty": "brutal",
+          "estimated_hours": 60,
+          "prerequisites": [
+            "H05.08",
+            "H06.03",
+            "H06.04",
+            "H06.06",
+            "H06.07"
+          ],
+          "brief": "Fetch FAT-backed pages through packet faults, follow a link, keep Telnet sessions alive, and shut down cleanly.",
+          "artifact": "browser image, fixture service, integrated trace, snapshots, and audit",
+          "deliverables": [
+            "A working browser image, fixture service, integrated trace, snapshots, and audit with reproducible instructions.",
+            "An independent protocol or parser oracle plus seeded faults.",
+            "A replayable packet-to-process-to-render evidence packet."
+          ],
+          "constraints": [
+            "All required networking is loopback or deterministic simulation.",
+            "Protocol and parser queues, states, inputs, and outputs are bounded.",
+            "Content bytes never become unescaped terminal control sequences."
+          ],
+          "adversarial_cases": [
+            "loss during linked fetch",
+            "Telnet child exits during render",
+            "malformed second response"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic protocol and parser checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every adversarial packet or byte split replays without a crash, hang, or leak."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records seed, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The next-stage probe consumes the browser and trace handoff directly."
+            }
+          ],
+          "handoff": "Browser image, corpus, and packet-to-render trace pass to physical work.",
+          "safety": "All services use loopback or simulation; no public bind shell, Internet traffic, TLS claim, or terminal injection."
+        }
+      ]
+    },
+    {
+      "id": "07",
+      "slug": "evidence-first-physical-bringup",
+      "title": "Evidence-First Physical Bringup",
+      "path": "vault/Challenges/07 Evidence-First Physical Bringup.md",
+      "overview": "Reconstruct JTAG and flash protocols, audit board facts, diagnose clocks, and compare C, RTL, and recorded hardware without requiring a live board.",
+      "entry_gate": "Complete modules 07.01 through 07.03 or simulation equivalents, gate-07, and preserve the H06 browser workload.",
+      "stage_handoff": "A reviewed board pack, read-only flash transcript, three-way concordance report, rollback image, and bringup capsule.",
+      "safety": "Required work uses simulation and recordings; live work needs an allowlisted board, voltage checks, current limiting, stop rules, and experienced review.",
+      "sources": [
+        {
+          "title": "IEEE 1149.1 standard page",
+          "url": "https://standards.ieee.org/ieee/1149.1/4484/",
+          "use": "Ground TAP, scan, reset, and boundary-scan terminology in the governing standard."
+        },
+        {
+          "title": "AMD configuration guide UG470",
+          "url": "https://docs.amd.com/v/u/en-US/ug470_7Series_Config",
+          "use": "Define configuration, startup, reset, status, and handling for a supported FPGA."
+        },
+        {
+          "title": "Digilent Arty A7 schematic",
+          "url": "https://digilent.com/reference/_media/programmable-logic/arty-a7/arty-a7-e2-sch.pdf",
+          "use": "Trace clock, reset, LED, JTAG, power, memory, and connector nets."
+        },
+        {
+          "title": "AMD programming guide UG908",
+          "url": "https://docs.amd.com/r/en-US/ug908-vivado-programming-debugging",
+          "use": "Plan staged programming, capture evidence, and rollback with vendor tools."
+        }
+      ],
+      "challenges": [
+        {
+          "id": "H07.01",
+          "stars": 1,
+          "stage": "07",
+          "title": "TAP from Unknown State",
+          "slug": "tap-from-unknown-state",
+          "lane": "construction",
+          "difficulty": "brutal",
+          "estimated_hours": 28,
+          "prerequisites": [
+            "07.01",
+            "H01.04",
+            "H03.05"
+          ],
+          "brief": "Model all TAP transitions, recover from any start, and generate shortest paths between every state pair.",
+          "artifact": "C TAP model, path planner, exhaustive tests, and renderer",
+          "deliverables": [
+            "A working C TAP model, path planner, exhaustive tests, and renderer with reproducible instructions.",
+            "A simulation or recorded-hardware oracle plus seeded fault fixtures.",
+            "A replayable bringup evidence packet with provenance and stop-go decisions."
+          ],
+          "constraints": [
+            "Simulation and recorded fixtures satisfy every required acceptance check.",
+            "Board facts, tool facts, protocol hypotheses, and observations remain distinct.",
+            "Live programming or driving is disabled until the reviewed safety gate passes."
+          ],
+          "adversarial_cases": [
+            "each of sixteen starts",
+            "five high TMS samples",
+            "pause-to-shift through Exit2"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic simulation and recorded-fixture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every injected physical-layer hypothesis replays with an earliest owning diagnosis."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records provenance, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The final capsule consumes prior browser, machine, device, and logic handoffs directly."
+            }
+          ],
+          "handoff": "The TAP navigator drives boundary scan and recorded JTAG.",
+          "safety": "Required work uses simulation and recordings; live work needs an allowlisted board, voltage checks, current limiting, stop rules, and experienced review."
+        },
+        {
+          "id": "H07.02",
+          "stars": 1,
+          "stage": "07",
+          "title": "Boundary-Scan Detective",
+          "slug": "boundary-scan-detective",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 32,
+          "prerequisites": [
+            "07.02",
+            "H07.01"
+          ],
+          "brief": "Infer swapped, stuck, and open nets from simulated boundary-scan observations using minimal stimuli.",
+          "artifact": "board-net model, diagnosis engine, planner, and ambiguity report",
+          "deliverables": [
+            "A working board-net model, diagnosis engine, planner, and ambiguity report with reproducible instructions.",
+            "A simulation or recorded-hardware oracle plus seeded fault fixtures.",
+            "A replayable bringup evidence packet with provenance and stop-go decisions."
+          ],
+          "constraints": [
+            "Simulation and recorded fixtures satisfy every required acceptance check.",
+            "Board facts, tool facts, protocol hypotheses, and observations remain distinct.",
+            "Live programming or driving is disabled until the reviewed safety gate passes."
+          ],
+          "adversarial_cases": [
+            "LED nets swapped",
+            "driven net stuck low",
+            "observation cell disconnected"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic simulation and recorded-fixture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every injected physical-layer hypothesis replays with an earliest owning diagnosis."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records provenance, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The final capsule consumes prior browser, machine, device, and logic handoffs directly."
+            }
+          ],
+          "handoff": "The diagnosed pin map feeds constraint auditing.",
+          "safety": "Required work uses simulation and recordings; live work needs an allowlisted board, voltage checks, current limiting, stop rules, and experienced review."
+        },
+        {
+          "id": "H07.03",
+          "stars": 2,
+          "stage": "07",
+          "title": "USB-SPI Dialect Archaeology",
+          "slug": "usb-spi-dialect-archaeology",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 34,
+          "prerequisites": [
+            "07.01",
+            "H00.01",
+            "H02.06"
+          ],
+          "brief": "Reconstruct command framing, address order, transfer limits, and errors from realhw-inspired traces without copying branch code.",
+          "artifact": "protocol specification, mock transport, C client, and corpus",
+          "deliverables": [
+            "A working protocol specification, mock transport, C client, and corpus with reproducible instructions.",
+            "A simulation or recorded-hardware oracle plus seeded fault fixtures.",
+            "A replayable bringup evidence packet with provenance and stop-go decisions."
+          ],
+          "constraints": [
+            "Simulation and recorded fixtures satisfy every required acceptance check.",
+            "Board facts, tool facts, protocol hypotheses, and observations remain distinct.",
+            "Live programming or driving is disabled until the reviewed safety gate passes."
+          ],
+          "adversarial_cases": [
+            "short USB transfer",
+            "reversed flash address",
+            "all-ones disconnect"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic simulation and recorded-fixture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every injected physical-layer hypothesis replays with an earliest owning diagnosis."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records provenance, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The final capsule consumes prior browser, machine, device, and logic handoffs directly."
+            }
+          ],
+          "handoff": "The model becomes the read-only flash interface.",
+          "safety": "Required work uses simulation and recordings; live work needs an allowlisted board, voltage checks, current limiting, stop rules, and experienced review."
+        },
+        {
+          "id": "H07.04",
+          "stars": 2,
+          "stage": "07",
+          "title": "Read-Only Flash Forensic",
+          "slug": "read-only-flash-forensic",
+          "lane": "adversary",
+          "difficulty": "brutal",
+          "estimated_hours": 34,
+          "prerequisites": [
+            "H07.03"
+          ],
+          "brief": "Verify identity and capacity, dump bounded chunks with resume and hashes, and reject disconnect or corruption.",
+          "artifact": "read-only flash client, mock image, resume manifest, and transcript",
+          "deliverables": [
+            "A working read-only flash client, mock image, resume manifest, and transcript with reproducible instructions.",
+            "A simulation or recorded-hardware oracle plus seeded fault fixtures.",
+            "A replayable bringup evidence packet with provenance and stop-go decisions."
+          ],
+          "constraints": [
+            "Simulation and recorded fixtures satisfy every required acceptance check.",
+            "Board facts, tool facts, protocol hypotheses, and observations remain distinct.",
+            "Live programming or driving is disabled until the reviewed safety gate passes."
+          ],
+          "adversarial_cases": [
+            "cross-capacity request",
+            "bit flipped on resume",
+            "all-ones identity"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic simulation and recorded-fixture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every injected physical-layer hypothesis replays with an earliest owning diagnosis."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records provenance, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The final capsule consumes prior browser, machine, device, and logic handoffs directly."
+            }
+          ],
+          "handoff": "The verified image enters the board pack without write authority.",
+          "safety": "Required work uses simulation and recordings; live work needs an allowlisted board, voltage checks, current limiting, stop rules, and experienced review."
+        },
+        {
+          "id": "H07.05",
+          "stars": 2,
+          "stage": "07",
+          "title": "Schematic-to-Constraint Audit",
+          "slug": "schematic-to-constraint-audit",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 36,
+          "prerequisites": [
+            "07.02",
+            "H00.07"
+          ],
+          "brief": "Check board nets against pin, bank-voltage, clock, reset, and I/O constraints with provenance.",
+          "artifact": "board model, constraint linter, provenance table, and fault fixtures",
+          "deliverables": [
+            "A working board model, constraint linter, provenance table, and fault fixtures with reproducible instructions.",
+            "A simulation or recorded-hardware oracle plus seeded fault fixtures.",
+            "A replayable bringup evidence packet with provenance and stop-go decisions."
+          ],
+          "constraints": [
+            "Simulation and recorded fixtures satisfy every required acceptance check.",
+            "Board facts, tool facts, protocol hypotheses, and observations remain distinct.",
+            "Live programming or driving is disabled until the reviewed safety gate passes."
+          ],
+          "adversarial_cases": [
+            "two signals on one pin",
+            "wrong bank voltage",
+            "clock missing timing constraint"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic simulation and recorded-fixture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every injected physical-layer hypothesis replays with an earliest owning diagnosis."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records provenance, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The final capsule consumes prior browser, machine, device, and logic handoffs directly."
+            }
+          ],
+          "handoff": "The reviewed model becomes the optional-live allowlist.",
+          "safety": "Required work uses simulation and recordings; live work needs an allowlisted board, voltage checks, current limiting, stop rules, and experienced review."
+        },
+        {
+          "id": "H07.06",
+          "stars": 2,
+          "stage": "07",
+          "title": "Three-Clocks Bringup",
+          "slug": "three-clocks-bringup",
+          "lane": "archaeology",
+          "difficulty": "brutal",
+          "estimated_hours": 32,
+          "prerequisites": [
+            "07.03",
+            "H02.01",
+            "H07.05"
+          ],
+          "brief": "Distinguish oscillator, synthesis constraint, and observed timebase while diagnosing reset and pin faults.",
+          "artifact": "timing ledger, board twin, waveforms, and decision tree",
+          "deliverables": [
+            "A working timing ledger, board twin, waveforms, and decision tree with reproducible instructions.",
+            "A simulation or recorded-hardware oracle plus seeded fault fixtures.",
+            "A replayable bringup evidence packet with provenance and stop-go decisions."
+          ],
+          "constraints": [
+            "Simulation and recorded fixtures satisfy every required acceptance check.",
+            "Board facts, tool facts, protocol hypotheses, and observations remain distinct.",
+            "Live programming or driving is disabled until the reviewed safety gate passes."
+          ],
+          "adversarial_cases": [
+            "constraint differs from oscillator",
+            "reset releases late",
+            "LED inverted while UART correct"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic simulation and recorded-fixture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every injected physical-layer hypothesis replays with an earliest owning diagnosis."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records provenance, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The final capsule consumes prior browser, machine, device, and logic handoffs directly."
+            }
+          ],
+          "handoff": "The clock-reset-pin contract aligns all traces.",
+          "safety": "Required work uses simulation and recordings; live work needs an allowlisted board, voltage checks, current limiting, stop rules, and experienced review."
+        },
+        {
+          "id": "H07.07",
+          "stars": 2,
+          "stage": "07",
+          "title": "C-RTL-Board Concordance",
+          "slug": "c-rtl-board-concordance",
+          "lane": "integration",
+          "difficulty": "brutal",
+          "estimated_hours": 42,
+          "prerequisites": [
+            "07.03",
+            "H01.07",
+            "H02.08",
+            "H07.06"
+          ],
+          "brief": "Align C, RTL, and recorded-board events and locate the first owning mismatch despite capture latency.",
+          "artifact": "trace aligner, concordance report, replay capsule, and reducer",
+          "deliverables": [
+            "A working trace aligner, concordance report, replay capsule, and reducer with reproducible instructions.",
+            "A simulation or recorded-hardware oracle plus seeded fault fixtures.",
+            "A replayable bringup evidence packet with provenance and stop-go decisions."
+          ],
+          "constraints": [
+            "Simulation and recorded fixtures satisfy every required acceptance check.",
+            "Board facts, tool facts, protocol hypotheses, and observations remain distinct.",
+            "Live programming or driving is disabled until the reviewed safety gate passes."
+          ],
+          "adversarial_cases": [
+            "one-edge reset offset",
+            "UART capture latency",
+            "correct LED period with wrong phase"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic simulation and recorded-fixture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every injected physical-layer hypothesis replays with an earliest owning diagnosis."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records provenance, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The final capsule consumes prior browser, machine, device, and logic handoffs directly."
+            }
+          ],
+          "handoff": "The capsule proves which contracts survived hardware translation.",
+          "safety": "Required work uses simulation and recordings; live work needs an allowlisted board, voltage checks, current limiting, stop rules, and experienced review."
+        },
+        {
+          "id": "H07.08",
+          "stars": 3,
+          "stage": "07",
+          "title": "Boss: Blind Bringup",
+          "slug": "boss-blind-bringup",
+          "lane": "boss",
+          "difficulty": "brutal",
+          "estimated_hours": 72,
+          "prerequisites": [
+            "H06.08",
+            "H07.02",
+            "H07.04",
+            "H07.05",
+            "H07.06",
+            "H07.07"
+          ],
+          "brief": "Stage LED, UART, RAM, boot, and browser bringup with stop-go gates, rollback, and a full boundary ledger.",
+          "artifact": "reviewed board pack, staged images, rollback, browser transcript, and capsule",
+          "deliverables": [
+            "A working reviewed board pack, staged images, rollback, browser transcript, and capsule with reproducible instructions.",
+            "A simulation or recorded-hardware oracle plus seeded fault fixtures.",
+            "A replayable bringup evidence packet with provenance and stop-go decisions."
+          ],
+          "constraints": [
+            "Simulation and recorded fixtures satisfy every required acceptance check.",
+            "Board facts, tool facts, protocol hypotheses, and observations remain distinct.",
+            "Live programming or driving is disabled until the reviewed safety gate passes."
+          ],
+          "adversarial_cases": [
+            "wrong LED pin",
+            "UART works but RAM boundary fails",
+            "divergence after packet activation"
+          ],
+          "acceptance": [
+            {
+              "id": "A1",
+              "criterion": "The artifact passes fresh deterministic simulation and recorded-fixture checks."
+            },
+            {
+              "id": "A2",
+              "criterion": "Every injected physical-layer hypothesis replays with an earliest owning diagnosis."
+            },
+            {
+              "id": "A3",
+              "criterion": "Evidence records provenance, tools, hashes, first divergence, invariant, and limitation."
+            },
+            {
+              "id": "A4",
+              "criterion": "The final capsule consumes prior browser, machine, device, and logic handoffs directly."
+            }
+          ],
+          "handoff": "The final capsule links observations through every course layer.",
+          "safety": "Required work uses simulation and recordings; live work needs an allowlisted board, voltage checks, current limiting, stop rules, and experienced review."
+        }
+      ]
+    }
+  ]
+}

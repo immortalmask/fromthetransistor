@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "gate-07",
+  "questions": [
+    {
+      "prompt": "Which TMS sequence reliably drives a standard JTAG TAP to Test-Logic-Reset from an unknown state?",
+      "choices": {
+        "A": "Hold TMS low for one clock",
+        "B": "Hold TMS high for at least five TCK edges",
+        "C": "Toggle TDI without TCK",
+        "D": "Read TDO exactly once"
+      },
+      "answer": "B",
+      "explanation": "From every TAP state, five consecutive TMS-high transitions reach Test-Logic-Reset. This gives the host a state-independent recovery sequence."
+    },
+    {
+      "prompt": "When does a value shifted through a JTAG instruction register become the active instruction?",
+      "choices": {
+        "A": "On the first Shift-IR clock",
+        "B": "When the TAP reaches Update-IR",
+        "C": "Only after power is removed",
+        "D": "Whenever TDO is high"
+      },
+      "answer": "B",
+      "explanation": "Capture, shift, and update are distinct phases. The shift register can change bit by bit without affecting the active instruction until Update-IR."
+    },
+    {
+      "prompt": "Before connecting a programmer to an unknown target, which evidence is most important?",
+      "choices": {
+        "A": "The color of the PCB solder mask",
+        "B": "Verified common ground, connector orientation, signal voltage, and drive ownership",
+        "C": "A browser screenshot",
+        "D": "That the cable fits mechanically"
+      },
+      "answer": "B",
+      "explanation": "Mechanical fit does not establish electrical compatibility. Wrong voltage, orientation, ground, or two active drivers can damage both target and adapter."
+    },
+    {
+      "prompt": "What is the safest first-power practice for an unverified board?",
+      "choices": {
+        "A": "Use the highest available current limit so it boots quickly",
+        "B": "Use a current-limited supply, known ground, measured checkpoints, and stop on excess current or heat",
+        "C": "Program the largest bitstream before measuring rails",
+        "D": "Touch components to estimate voltage"
+      },
+      "answer": "B",
+      "explanation": "A conservative current limit and staged measurements contain faults. Excess current, heat, odor, or unstable rails are stop conditions, not prompts to continue."
+    },
+    {
+      "prompt": "A board has an unproven core rail, failed JTAG, and garbled UART. Which should be investigated first?",
+      "choices": {
+        "A": "HTML rendering",
+        "B": "UART application code",
+        "C": "The core rail and other lower-level power/clock/reset prerequisites",
+        "D": "Dynamic linker symbol order"
+      },
+      "answer": "C",
+      "explanation": "Higher-layer symptoms are uninterpretable until their dependencies are proven. Bringup proceeds from safe power through clock/reset and debug before application interfaces."
+    }
+  ]
+}

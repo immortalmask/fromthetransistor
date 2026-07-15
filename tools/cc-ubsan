@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+real_cc=${FTT_REAL_CC:-cc}
+exec "$real_cc" \
+  -fsanitize=undefined \
+  -fno-sanitize-recover=all \
+  -fno-omit-frame-pointer \
+  "$@"

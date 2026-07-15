@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "gate-05",
+  "questions": [
+    {
+      "prompt": "After changing a valid writable page-table entry to read-only, why may a TLB invalidation be required?",
+      "choices": {
+        "A": "The disk block cache always contains the old page",
+        "B": "A cached translation may still contain the old writable permission",
+        "C": "Invalidation changes the physical page contents",
+        "D": "Only to make the page table smaller"
+      },
+      "answer": "B",
+      "explanation": "The TLB caches both address and permission decision. Without the architecture's required invalidation, the old writable entry can continue authorizing stores."
+    },
+    {
+      "prompt": "What must a kernel do before copying n bytes from a user pointer?",
+      "choices": {
+        "A": "Check only that the first byte is mapped",
+        "B": "Trust pointers from a process that already opened a file",
+        "C": "Validate overflow, every covered mapping, and required user permissions for the complete range",
+        "D": "Temporarily disable memory protection"
+      },
+      "answer": "C",
+      "explanation": "A range can wrap or cross into an unmapped or supervisor page. The complete operation and permission must be proven before or during a fault-safe copy."
+    },
+    {
+      "prompt": "After fork, two descriptors refer to the same open-file description. What state is normally shared?",
+      "choices": {
+        "A": "The process identifier",
+        "B": "The current file offset and open status",
+        "C": "The entire virtual address space forever",
+        "D": "The child's exit code before exit"
+      },
+      "answer": "B",
+      "explanation": "Descriptor tables are per process, but duplicated descriptors can reference one open-file description, including its offset and status. Reference counts preserve its lifetime."
+    },
+    {
+      "prompt": "What prevents a corrupted FAT cluster chain from looping forever?",
+      "choices": {
+        "A": "Assuming every image was cleanly unmounted",
+        "B": "A traversal bound plus cycle detection over validated cluster numbers",
+        "C": "Reading the same entry until it changes",
+        "D": "Treating every zero byte as end-of-file"
+      },
+      "answer": "B",
+      "explanation": "All on-disk metadata is untrusted. Range validation, a cluster-count step bound, and explicit cycle detection give deterministic safe failure."
+    },
+    {
+      "prompt": "Why can a pipeline reader wait forever if the parent retains an unused copy of the pipe write end?",
+      "choices": {
+        "A": "The reader sees EOF only after every write-end reference is closed",
+        "B": "Pipes require a FAT allocation",
+        "C": "The scheduler refuses to run readers",
+        "D": "The shell must keep every descriptor open"
+      },
+      "answer": "A",
+      "explanation": "EOF is an ownership fact: as long as any write endpoint remains open, more bytes could arrive. Every process must close pipe ends it does not own."
+    }
+  ]
+}

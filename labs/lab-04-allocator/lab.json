@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "lab-04-allocator",
+  "module": "04.03",
+  "title": "Aligned Arena Allocator",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "padding-and-mixed-sizes",
+      "argv": ["{build}/program", "1", "8", "9"],
+      "expected_stdout": "alloc size=1 offset=0 end=1\nalloc size=8 offset=8 end=16\nalloc size=9 offset=16 end=25\nused=25 capacity=64\n"
+    },
+    {
+      "name": "already-aligned",
+      "argv": ["{build}/program", "8", "8"],
+      "expected_stdout": "alloc size=8 offset=0 end=8\nalloc size=8 offset=8 end=16\nused=16 capacity=64\n"
+    },
+    {
+      "name": "exact-capacity",
+      "argv": ["{build}/program", "64"],
+      "expected_stdout": "alloc size=64 offset=0 end=64\nused=64 capacity=64\n"
+    },
+    {
+      "name": "out-of-memory-after-prefix",
+      "argv": ["{build}/program", "16", "41", "8"],
+      "expected_stdout": "alloc size=16 offset=0 end=16\nalloc size=41 offset=16 end=57\noom size=8 used=57 capacity=64\n",
+      "expected_exit": 3
+    },
+    {
+      "name": "reject-zero",
+      "argv": ["{build}/program", "0"],
+      "expected_stdout": "error: sizes must be positive decimal integers\n",
+      "expected_exit": 2
+    },
+    {
+      "name": "padding-then-exact-capacity",
+      "argv": ["{build}/program", "1", "56"],
+      "expected_stdout": "alloc size=1 offset=0 end=1\nalloc size=56 offset=8 end=64\nused=64 capacity=64\n"
+    },
+    {
+      "name": "alignment-padding-causes-out-of-memory",
+      "argv": ["{build}/program", "57", "1"],
+      "expected_stdout": "alloc size=57 offset=0 end=57\noom size=1 used=57 capacity=64\n",
+      "expected_exit": 3
+    },
+    {
+      "name": "reject-size-above-arena-capacity",
+      "argv": ["{build}/program", "65"],
+      "expected_stdout": "error: sizes must be positive decimal integers\n",
+      "expected_exit": 2
+    }
+  ]
+}

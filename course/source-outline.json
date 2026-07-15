@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "source_document": "README.md",
+  "source_title": "From the Transistor to the Web Browser",
+  "policy": "The original 24 bullets are preserved verbatim here. Catalog modules may narrow or adapt implementation choices, but each source item maps exactly once.",
+  "sections": [
+    {
+      "id": "01",
+      "original_heading": "Section 1: Intro: Cheating our way past the transistor",
+      "original_weeks": 0.5
+    },
+    {
+      "id": "02",
+      "original_heading": "Section 2: Bringup: What language is hardware coded in?",
+      "original_weeks": 0.5
+    },
+    {
+      "id": "03",
+      "original_heading": "Section 3: Processor: What is a processor anyway?",
+      "original_weeks": 3
+    },
+    {
+      "id": "04",
+      "original_heading": "Section 4: Compiler: A “high” level language",
+      "original_weeks": 3
+    },
+    {
+      "id": "05",
+      "original_heading": "Section 5: Operating System: Software we take for granted",
+      "original_weeks": 3
+    },
+    {
+      "id": "06",
+      "original_heading": "Section 6: Browser: Coming online",
+      "original_weeks": 1
+    },
+    {
+      "id": "07",
+      "original_heading": "Section 7: Physical: Running on real hardware",
+      "original_weeks": 1
+    }
+  ],
+  "items": [
+    {
+      "id": "01.01",
+      "section": "01",
+      "title": "So about those transistors",
+      "language": null,
+      "estimated_lines": null,
+      "original_text": "So about those transistors -- Course overview. Describe how FPGAs are buildable using transistors, and that ICs are just collections of transistors in a nice reliable package. Understand the LUTs and stuff. Talk briefly about the theory of transistors, but all projects must build on each other so we can’t build one."
+    },
+    {
+      "id": "01.02",
+      "section": "01",
+      "title": "Emulation",
+      "language": null,
+      "estimated_lines": null,
+      "original_text": "Emulation -- Building on real hardware limits the reach of this course. Using something like Verilator will allow anyone with a computer to play."
+    },
+    {
+      "id": "02.01",
+      "section": "02",
+      "title": "Blinking an LED",
+      "language": "Verilog",
+      "estimated_lines": 10,
+      "original_text": "Blinking an LED(Verilog, 10) -- Your first little program! Getting the simulator working. Learning Verilog."
+    },
+    {
+      "id": "02.02",
+      "section": "02",
+      "title": "Building a UART",
+      "language": "Verilog",
+      "estimated_lines": 100,
+      "original_text": "Building a UART(Verilog, 100) -- An intro chapter to Verilog, copy a real UART, introducing the concept of MMIO, though the serial port may be semihosting. Serial test echo program and led control."
+    },
+    {
+      "id": "03.01",
+      "section": "03",
+      "title": "Coding an assembler",
+      "language": "Python",
+      "estimated_lines": 500,
+      "original_text": "Coding an assembler(Python, 500) -- Straightforward and boring, write in python. Happens in parallel with the CPU building. Teaches you ARM assembly. Initially outputs just binary files, but changed when you write a linker."
+    },
+    {
+      "id": "03.02",
+      "section": "03",
+      "title": "Building a ARM7 CPU",
+      "language": "Verilog",
+      "estimated_lines": 1500,
+      "original_text": "Building a ARM7 CPU(Verilog, 1500) -- Break this into subchapters. A simple pipeline to start, decode, fetch, execute. How much BRAM do we have? We need at least 1MB, DDR would be hard I think, maybe an SRAM. Simulatable and synthesizable."
+    },
+    {
+      "id": "03.03",
+      "section": "03",
+      "title": "Coding a bootrom",
+      "language": "Assembler",
+      "estimated_lines": 40,
+      "original_text": "Coding a bootrom(Assembler, 40) -- This allows code download into RAM over the serial port, and is baked into the FPGA image. Cute test programs run on this."
+    },
+    {
+      "id": "04.01",
+      "section": "04",
+      "title": "Building a C compiler",
+      "language": "Haskell",
+      "estimated_lines": 2000,
+      "original_text": "Building a C compiler(Haskell, 2000) -- A bit more interesting, cover the basics of compiler design. Write in haskell. Write a parser. Break this into subchapters. Outputs ARM assembly."
+    },
+    {
+      "id": "04.02",
+      "section": "04",
+      "title": "Building a linker",
+      "language": "Python",
+      "estimated_lines": 300,
+      "original_text": "Building a linker(Python, 300) -- If you are clever, this should take a day. Output elf files. Use for testing with QEMU, semihosting."
+    },
+    {
+      "id": "04.03",
+      "section": "04",
+      "title": "libc + malloc",
+      "language": "C",
+      "estimated_lines": 500,
+      "original_text": "libc + malloc(C, 500) -- The gateway to more complicated programs. libc is only half here, things like memcpy and memset and printf, but no syscall wrappers."
+    },
+    {
+      "id": "04.04",
+      "section": "04",
+      "title": "Building an ethernet controller",
+      "language": "Verilog",
+      "estimated_lines": 200,
+      "original_text": "Building an ethernet controller(Verilog, 200) -- Talk to a real PHY, consider carefully MMIO design."
+    },
+    {
+      "id": "04.05",
+      "section": "04",
+      "title": "Writing a bootloader",
+      "language": "C",
+      "estimated_lines": 300,
+      "original_text": "Writing a bootloader(C, 300) -- Write ethernet program to boot kernel over UDP. First thing written in C. Maybe don’t redownload over serial each time and embed in FPGA image."
+    },
+    {
+      "id": "05.01",
+      "section": "05",
+      "title": "Building an MMU",
+      "language": "Verilog",
+      "estimated_lines": 1000,
+      "original_text": "Building an MMU(Verilog, 1000) -- ARM9ish, explain TLBs and other fun things. Maybe also a memory controller, depending on how the FPGA is, then add the init code to your bootloader."
+    },
+    {
+      "id": "05.02",
+      "section": "05",
+      "title": "Building an operating system",
+      "language": "C",
+      "estimated_lines": 2500,
+      "original_text": "Building an operating system(C, 2500) -- UNIXish, only user space threads. (open, read, write, close), (fork, execve, wait, sleep, exit), (mmap, munmap, mprotect). Consider the debug interface you are using, ranging from printf to perhaps a gdbremote stub into kernel. Break into subchapters."
+    },
+    {
+      "id": "05.03",
+      "section": "05",
+      "title": "Talking to an SD card",
+      "language": "Verilog",
+      "estimated_lines": 150,
+      "original_text": "Talking to an SD card(Verilog, 150) -- The last hardware you have to do. And a driver"
+    },
+    {
+      "id": "05.04",
+      "section": "05",
+      "title": "FAT",
+      "language": "C",
+      "estimated_lines": 300,
+      "original_text": "FAT(C, 300) -- A real filesystem, I think fat is the simplest"
+    },
+    {
+      "id": "05.05",
+      "section": "05",
+      "title": "init, shell, download, cat, ls, rm",
+      "language": "C",
+      "estimated_lines": 250,
+      "original_text": "init, shell, download, cat, ls, rm(C, 250) -- Your first user space programs."
+    },
+    {
+      "id": "06.01",
+      "section": "06",
+      "title": "Building a TCP stack",
+      "language": "C",
+      "estimated_lines": 500,
+      "original_text": "Building a TCP stack(C, 500) -- Probably coded in the kernel, integrate the ethernet driver into the kernel. Add support for networking syscalls to kernel. (send, recv, bind, connect)"
+    },
+    {
+      "id": "06.02",
+      "section": "06",
+      "title": "telnetd, the power of being multiprocess",
+      "language": "C",
+      "estimated_lines": 50,
+      "original_text": "telnetd, the power of being multiprocess(C, 50) --  Written in C, user can connect multiple times with telnet. Really just a bind shell."
+    },
+    {
+      "id": "06.03",
+      "section": "06",
+      "title": "Space saving dynamic linking",
+      "language": "C",
+      "estimated_lines": 300,
+      "original_text": "Space saving dynamic linking(C, 300) -- Because we can, explain how dynamic linker is just a user space program. Changes to linker required."
+    },
+    {
+      "id": "06.04",
+      "section": "06",
+      "title": "So about that web",
+      "language": "C",
+      "estimated_lines": 500,
+      "original_text": "So about that web(C, 500+) -- A “nice” text based web browser, using ANSI and terminal niceness. Dynamically linked and nice, nice as you want."
+    },
+    {
+      "id": "07.01",
+      "section": "07",
+      "title": "Talking to an FPGA",
+      "language": "C",
+      "estimated_lines": 200,
+      "original_text": "Talking to an FPGA(C, 200) -- A little code for the USB MCU to bitbang JTAG."
+    },
+    {
+      "id": "07.02",
+      "section": "07",
+      "title": "Building an FPGA board",
+      "language": null,
+      "estimated_lines": null,
+      "original_text": "Building an FPGA board -- Board design, FPGA BGA reflow, FPGA flash, a 50mhz clock, a USB JTAG port and flasher(no special hardware, a little cypress usb mcu to do jtag), a few leds, a reset button, a serial port(USB-FTDI) also powering via USB, an sd card, expansion connector(ide cable?), and an ethernet port. Optional, expansion board, host USB port, NTSC TV out, an ISA port, and PS/2 connector on the board to taunt you. We provide a toaster oven and a multimeter thermometer to do reflow. "
+    },
+    {
+      "id": "07.03",
+      "section": "07",
+      "title": "Bringup",
+      "language": null,
+      "estimated_lines": null,
+      "original_text": "Bringup -- Compiling and downloading the Verilog for the board"
+    }
+  ]
+}

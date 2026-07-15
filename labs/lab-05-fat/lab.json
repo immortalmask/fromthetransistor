@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "id": "lab-05-fat",
+  "module": "05.04",
+  "title": "Inspect a FAT Directory Entry",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "short-file-entry",
+      "argv": ["{build}/program", "524541444d4520205458542000000000000000000000000000000500d2040000"],
+      "stdin": "",
+      "expected_stdout": "kind=short name=README.TXT attr=0x20 cluster=5 size=1234\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "split-cluster-directory",
+      "argv": ["{build}/program", "424f4f5420202020202020100000000000000000010000000000020000000000"],
+      "stdin": "",
+      "expected_stdout": "kind=short name=BOOT attr=0x10 cluster=65538 size=0\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "end-marker",
+      "argv": ["{build}/program", "0000000000000000000000000000000000000000000000000000000000000000"],
+      "stdin": "",
+      "expected_stdout": "kind=end\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "deleted-entry",
+      "argv": ["{build}/program", "e500000000000000000000000000000000000000000000000000000000000000"],
+      "stdin": "",
+      "expected_stdout": "kind=deleted\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "long-filename-entry",
+      "argv": ["{build}/program", "41000000000000000000000f00aa000000000000000000000000000000000000"],
+      "stdin": "",
+      "expected_stdout": "kind=lfn sequence=1 last=yes checksum=0xaa\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-wrong-length",
+      "argv": ["{build}/program", "00"],
+      "stdin": "",
+      "expected_stdout": "error: HEX64 must contain exactly 64 hexadecimal characters\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "uppercase-hex-input",
+      "argv": ["{build}/program", "524541444D4520205458542000000000000000000000000000000500D2040000"],
+      "stdin": "",
+      "expected_stdout": "kind=short name=README.TXT attr=0x20 cluster=5 size=1234\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "maximum-split-cluster-and-little-endian-size",
+      "argv": ["{build}/program", "412020202020202042494e200000000000000000ffff00000000ffffffffffff"],
+      "stdin": "",
+      "expected_stdout": "kind=short name=A.BIN attr=0x20 cluster=4294967295 size=4294967295\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "maximum-lfn-sequence-without-last-flag",
+      "argv": ["{build}/program", "14000000000000000000000f0055000000000000000000000000000000000000"],
+      "stdin": "",
+      "expected_stdout": "kind=lfn sequence=20 last=no checksum=0x55\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-zero-lfn-sequence-even-with-last-flag",
+      "argv": ["{build}/program", "40000000000000000000000f00aa000000000000000000000000000000000000"],
+      "stdin": "",
+      "expected_stdout": "error: invalid LFN sequence byte\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-internal-short-name-padding",
+      "argv": ["{build}/program", "4120422020202020545854200000000000000000000000000000000000000000"],
+      "stdin": "",
+      "expected_stdout": "error: unsupported or malformed ASCII short name\n",
+      "expected_exit": 2,
+      "timeout": 3
+    }
+  ]
+}

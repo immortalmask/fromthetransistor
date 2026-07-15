@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "course": "fromthetransistor",
+  "notebooks": [
+    {
+      "path": "vault/Notebooks/01_bytes_memory_contract.ipynb",
+      "title": "Bytes, C Memory, and Ownership Contracts",
+      "consumes": [],
+      "emits": "fromthetransistor/01-byte-contract.json",
+      "modules": ["00.04", "00.05", "00.06"]
+    },
+    {
+      "path": "vault/Notebooks/02_logic_uart_trace.ipynb",
+      "title": "Logic, Waveforms, MMIO, and UART Traces",
+      "consumes": ["fromthetransistor/01-byte-contract.json"],
+      "emits": "fromthetransistor/02-uart-trace.json",
+      "modules": ["00.08", "01.02", "02.02"]
+    },
+    {
+      "path": "vault/Notebooks/03_cpu_toolchain_image.ipynb",
+      "title": "Assembler, CPU Emulator, Boot Image, and Relocations",
+      "consumes": [
+        "fromthetransistor/01-byte-contract.json",
+        "fromthetransistor/02-uart-trace.json"
+      ],
+      "emits": "fromthetransistor/03-machine-image.json",
+      "modules": ["03.01", "03.02", "03.03", "04.02"]
+    },
+    {
+      "path": "vault/Notebooks/04_system_stack_integration.ipynb",
+      "title": "Virtual Memory, Storage, TCP, and Browser Boundaries",
+      "consumes": ["fromthetransistor/03-machine-image.json"],
+      "emits": "fromthetransistor/04-system-image.json",
+      "modules": ["05.01", "05.02", "05.03", "05.04", "06.01", "06.04"]
+    },
+    {
+      "path": "vault/Notebooks/05_simulation_first_bringup.ipynb",
+      "title": "Simulation-First FPGA, JTAG, Flash, and LED Bring-up",
+      "consumes": [
+        "fromthetransistor/02-uart-trace.json",
+        "fromthetransistor/04-system-image.json"
+      ],
+      "emits": "fromthetransistor/05-bringup-report.json",
+      "modules": ["02.01", "07.01", "07.02", "07.03"]
+    }
+  ]
+}

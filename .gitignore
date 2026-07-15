@@ -1,0 +1,11 @@
+.ftt/
+work/
+__pycache__/
+*.py[cod]
+.coverage
+.venv/
+notebook-artifacts/
+.c-test-build/
+build/
+dist/
+*.egg-info/

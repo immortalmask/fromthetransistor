@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "lab-00-bytes",
+  "module": "00.04",
+  "title": "Bytes and Endianness",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "mixed-endian-header",
+      "argv": ["{build}/program", "46", "54", "01", "05", "34", "12", "20", "00"],
+      "stdin": "",
+      "expected_stdout": "magic=FT version=1 flags=compressed,debug length=4660 entry=0x2000\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "zero-fields-and-no-flags",
+      "argv": ["{build}/program", "46", "54", "01", "00", "00", "00", "00", "00"],
+      "stdin": "",
+      "expected_stdout": "magic=FT version=1 flags=none length=0 entry=0x0000\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "all-flags-and-maximum-fields",
+      "argv": ["{build}/program", "46", "54", "01", "07", "ff", "ff", "ff", "ff"],
+      "stdin": "",
+      "expected_stdout": "magic=FT version=1 flags=compressed,executable,debug length=65535 entry=0xffff\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-non-hex-byte",
+      "argv": ["{build}/program", "46", "54", "01", "zz", "00", "00", "00", "00"],
+      "stdin": "",
+      "expected_stdout": "error: byte 3 is not two hexadecimal digits\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-reserved-flags",
+      "argv": ["{build}/program", "46", "54", "01", "08", "00", "00", "00", "00"],
+      "stdin": "",
+      "expected_stdout": "error: flags contain reserved bits\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "uppercase-hex-and-asymmetric-endianness",
+      "argv": ["{build}/program", "46", "54", "01", "02", "01", "80", "AB", "CD"],
+      "stdin": "",
+      "expected_stdout": "magic=FT version=1 flags=executable length=32769 entry=0xabcd\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-bad-magic-before-decoding",
+      "argv": ["{build}/program", "47", "54", "01", "00", "00", "00", "00", "00"],
+      "stdin": "",
+      "expected_stdout": "error: bad magic (expected 46 54)\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-unsupported-version",
+      "argv": ["{build}/program", "46", "54", "02", "00", "00", "00", "00", "00"],
+      "stdin": "",
+      "expected_stdout": "error: unsupported version 2\n",
+      "expected_exit": 2,
+      "timeout": 3
+    }
+  ]
+}

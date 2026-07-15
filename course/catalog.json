@@ -1,0 +1,787 @@
+{
+  "schema_version": 1,
+  "course": {
+    "id": "from-the-transistor",
+    "title": "From the Transistor to the Web Browser",
+    "short_title": "FTT",
+    "version": "0.2.0",
+    "description": "A cumulative, software-first systems course that grows a simulated computer from bits and gates into a small Unix-like system with a text web browser.",
+    "audience": "Programmers new to C and computer construction, including learners with some reverse-engineering experience",
+    "estimated_core_hours": 404,
+    "pedagogy": "predict, trace, implement, test, explain"
+  },
+  "toolchain": [
+    {
+      "command": "python3",
+      "required": true,
+      "purpose": "Run the course CLI, reference models, assemblers, and test harnesses",
+      "install_hint": "Install Python 3.11 or newer from your operating system package manager"
+    },
+    {
+      "command": "make",
+      "required": false,
+      "purpose": "Provide stable build and check entry points across labs",
+      "install_hint": "Install GNU Make or a compatible make implementation"
+    },
+    {
+      "command": "cc",
+      "required": true,
+      "purpose": "Compile the C runway exercises and host-side test programs",
+      "install_hint": "Install Clang or GCC and ensure the cc command is available"
+    },
+    {
+      "command": "git",
+      "required": false,
+      "purpose": "Checkpoint learner work and inspect changes safely",
+      "install_hint": "Install Git from your operating system package manager"
+    },
+    {
+      "command": "verilator",
+      "required": false,
+      "purpose": "Compile and trace the optional synthesizable RTL path",
+      "install_hint": "Install Verilator 5 or newer when beginning the RTL extension"
+    },
+    {
+      "command": "readelf",
+      "required": false,
+      "purpose": "Inspect ELF headers, sections, symbols, and relocations",
+      "install_hint": "Install GNU binutils"
+    },
+    {
+      "command": "objdump",
+      "required": false,
+      "purpose": "Disassemble and investigate host and target object files",
+      "install_hint": "Install GNU binutils"
+    },
+    {
+      "command": "jupyter",
+      "required": false,
+      "purpose": "Explore the optional cumulative notebooks interactively after the offline checker passes",
+      "install_hint": "Install the notebooks optional dependency group"
+    }
+  ],
+  "sections": [
+    {
+      "id": "00",
+      "slug": "c-runway",
+      "title": "C Runway",
+      "weeks": 3,
+      "summary": "Build the C, byte-level, debugging, ABI, and digital-logic foundation needed by every cumulative project."
+    },
+    {
+      "id": "01",
+      "slug": "intro",
+      "title": "Intro",
+      "weeks": 1,
+      "summary": "Cross the abstraction boundary from transistor switches to LUTs, then establish a deterministic simulation workflow."
+    },
+    {
+      "id": "02",
+      "slug": "bringup",
+      "title": "Bringup",
+      "weeks": 2,
+      "summary": "Learn synchronous hardware construction through an LED peripheral and a tested UART exposed through MMIO."
+    },
+    {
+      "id": "03",
+      "slug": "processor",
+      "title": "Processor",
+      "weeks": 6,
+      "summary": "Specify an ISA, assemble programs, execute them in a traceable CPU model, and load them through a boot ROM monitor."
+    },
+    {
+      "id": "04",
+      "slug": "compiler",
+      "title": "Compiler",
+      "weeks": 8,
+      "summary": "Create a small C toolchain, freestanding runtime, packet device, and network-capable second-stage bootloader."
+    },
+    {
+      "id": "05",
+      "slug": "operating-system",
+      "title": "Operating System",
+      "weeks": 10,
+      "summary": "Add protected virtual memory, processes, system calls, persistent storage, a filesystem, and a usable shell."
+    },
+    {
+      "id": "06",
+      "slug": "browser",
+      "title": "Browser",
+      "weeks": 6,
+      "summary": "Build the networking and user-space components needed to fetch and render a small, deliberately bounded web page."
+    },
+    {
+      "id": "07",
+      "slug": "physical",
+      "title": "Physical",
+      "weeks": 8,
+      "summary": "Optionally carry the verified software machine onto supported FPGA hardware and investigate JTAG and board bringup.",
+      "optional": true
+    }
+  ],
+  "modules": [
+    {
+      "id": "00.01",
+      "slug": "course-orientation",
+      "title": "Course Orientation",
+      "section": "00",
+      "source_ref": null,
+      "duration_hours": 2,
+      "path": "vault/00 C Runway/00.01 Course Orientation.md",
+      "prerequisites": [],
+      "language": [],
+      "lab": null,
+      "artifact": "A verified local checkout, learning log, and written scope contract",
+      "summary": "Learn the cumulative machine, evidence standard, safe operating boundaries, and repeatable study loop.",
+      "objectives": [
+        "Explain how each course section feeds the final browser",
+        "Run structural validation and distinguish it from a lab check",
+        "Create a recovery-friendly evidence and checkpoint routine"
+      ]
+    },
+    {
+      "id": "00.02",
+      "slug": "shell-build-debug-loop",
+      "title": "Shell Build and Debug Loop",
+      "section": "00",
+      "source_ref": null,
+      "duration_hours": 4,
+      "path": "vault/00 C Runway/00.02 Shell Build and Debug Loop.md",
+      "prerequisites": ["00.01"],
+      "language": ["Shell", "C"],
+      "lab": null,
+      "artifact": "A warning-clean program with a captured failing test, debugger trace, and repaired test",
+      "summary": "Practice a short edit-build-test-debug loop before the projects become layered.",
+      "objectives": [
+        "Navigate and inspect files without destructive commands",
+        "Compile with strict diagnostics and interpret process status",
+        "Reduce a failure with tests, sanitizers, and a debugger"
+      ]
+    },
+    {
+      "id": "00.03",
+      "slug": "c-values-control-flow",
+      "title": "C Values and Control Flow",
+      "section": "00",
+      "source_ref": null,
+      "duration_hours": 6,
+      "path": "vault/00 C Runway/00.03 C Values and Control Flow.md",
+      "prerequisites": ["00.02"],
+      "language": ["C"],
+      "lab": null,
+      "artifact": "A warning-clean command-line decoder with boundary-focused tests",
+      "summary": "Learn C expressions, integer types, functions, control flow, diagnostics, and the first forms of undefined behavior.",
+      "objectives": [
+        "Trace C expression evaluation and control flow",
+        "Choose explicit-width integer types at machine boundaries",
+        "Turn input assumptions into checked preconditions and tests"
+      ]
+    },
+    {
+      "id": "00.04",
+      "slug": "bytes-bits-representation",
+      "title": "Bytes Bits and Representation",
+      "section": "00",
+      "source_ref": null,
+      "duration_hours": 6,
+      "path": "vault/00 C Runway/00.04 Bytes Bits and Representation.md",
+      "prerequisites": ["00.03"],
+      "language": ["C", "Python"],
+      "lab": "lab-00-bytes",
+      "artifact": "A byte-inspection utility that decodes fields without alignment or endianness assumptions",
+      "summary": "Make signedness, width, endianness, masks, shifts, and binary layouts observable rather than mysterious.",
+      "objectives": [
+        "Convert between numeric values and byte representations",
+        "Extract and insert bit fields without undefined shifts",
+        "Recognize endianness and signedness mistakes from traces"
+      ]
+    },
+    {
+      "id": "00.05",
+      "slug": "pointers-arrays-strings",
+      "title": "Pointers Arrays and Strings",
+      "section": "00",
+      "source_ref": null,
+      "duration_hours": 8,
+      "path": "vault/00 C Runway/00.05 Pointers Arrays and Strings.md",
+      "prerequisites": ["00.03", "00.04"],
+      "language": ["C"],
+      "lab": null,
+      "artifact": "A bounded byte-buffer API with tests for empty, full, overlapping, and unterminated inputs",
+      "summary": "Treat pointers as typed addresses with explicit object bounds and lifetimes.",
+      "objectives": [
+        "Draw pointer, array, and string object layouts",
+        "Write length-aware traversal and copying code",
+        "Diagnose out-of-bounds, use-after-lifetime, and missing-terminator faults"
+      ]
+    },
+    {
+      "id": "00.06",
+      "slug": "structs-memory-ownership",
+      "title": "Structs Memory and Ownership",
+      "section": "00",
+      "source_ref": null,
+      "duration_hours": 8,
+      "path": "vault/00 C Runway/00.06 Structs Memory and Ownership.md",
+      "prerequisites": ["00.05"],
+      "language": ["C"],
+      "lab": null,
+      "artifact": "A small owned collection with explicit init/destroy contracts and allocation-failure tests",
+      "summary": "Use structs and ownership conventions to make manual resource management reviewable.",
+      "objectives": [
+        "Explain struct padding and why wire formats need explicit encoding",
+        "State ownership and lifetime rules at every API boundary",
+        "Clean up partially initialized objects on every failure path"
+      ]
+    },
+    {
+      "id": "00.07",
+      "slug": "functions-abi-object-files",
+      "title": "Functions ABI and Object Files",
+      "section": "00",
+      "source_ref": null,
+      "duration_hours": 6,
+      "path": "vault/00 C Runway/00.07 Functions ABI and Object Files.md",
+      "prerequisites": ["00.05"],
+      "language": ["C", "Assembly"],
+      "lab": null,
+      "artifact": "An annotated disassembly and object-file report for a multi-file C program",
+      "summary": "Connect C calls to registers, stack frames, symbols, sections, relocations, and final executables.",
+      "objectives": [
+        "Trace arguments, return values, and saved state through a call",
+        "Distinguish compiling, assembling, linking, and loading",
+        "Use symbols and relocations to explain unresolved addresses"
+      ]
+    },
+    {
+      "id": "00.08",
+      "slug": "digital-logic-state-machines",
+      "title": "Digital Logic and State Machines",
+      "section": "00",
+      "source_ref": null,
+      "duration_hours": 8,
+      "path": "vault/00 C Runway/00.08 Digital Logic and State Machines.md",
+      "prerequisites": ["00.04"],
+      "language": ["Python", "SystemVerilog"],
+      "lab": null,
+      "artifact": "A truth-table-derived combinational design and a cycle-accurate state-machine trace",
+      "summary": "Learn combinational logic, registers, clocks, and state machines before writing device RTL.",
+      "objectives": [
+        "Derive logic from a truth table",
+        "Separate combinational next-state logic from registered state",
+        "Predict a synchronous machine one clock edge at a time"
+      ]
+    },
+    {
+      "id": "01.01",
+      "slug": "transistors-gates-luts",
+      "title": "Transistors Gates and LUTs",
+      "section": "01",
+      "source_ref": "01.01",
+      "duration_hours": 3,
+      "path": "vault/01 Intro/01.01 Transistors Gates and LUTs.md",
+      "prerequisites": ["00.08"],
+      "language": ["C", "SystemVerilog"],
+      "lab": "lab-01-logic",
+      "artifact": "A tested two-input LUT and clocked wrapping counter plus an abstraction map from switch to FPGA LUT",
+      "summary": "Use transistor theory only far enough to justify gates, storage, LUTs, and the RTL abstraction boundary.",
+      "objectives": [
+        "Explain what is preserved at each hardware abstraction layer",
+        "Map Boolean functions onto muxes and LUT contents",
+        "State why the course simulates rather than fabricates transistors"
+      ]
+    },
+    {
+      "id": "01.02",
+      "slug": "simulation-waveforms",
+      "title": "Simulation and Waveforms",
+      "section": "01",
+      "source_ref": "01.02",
+      "duration_hours": 5,
+      "path": "vault/01 Intro/01.02 Simulation and Waveforms.md",
+      "prerequisites": ["01.01", "00.02"],
+      "language": ["Python", "SystemVerilog"],
+      "lab": null,
+      "artifact": "A deterministic simulator harness with assertions, a failing seed, and an annotated waveform",
+      "summary": "Establish prediction, assertion, trace, and replay as the hardware debugging loop.",
+      "objectives": [
+        "Distinguish simulation time, cycles, and host runtime",
+        "Write self-checking tests around observable interfaces",
+        "Reduce a failure using the first divergent waveform cycle"
+      ]
+    },
+    {
+      "id": "02.01",
+      "slug": "blinking-led",
+      "title": "Blinking an LED",
+      "section": "02",
+      "source_ref": "02.01",
+      "duration_hours": 4,
+      "path": "vault/02 Bringup/02.01 Blinking an LED.md",
+      "prerequisites": ["01.02"],
+      "language": ["C", "SystemVerilog"],
+      "lab": null,
+      "artifact": "A resettable LED divider with period assertions and a short evidence waveform",
+      "summary": "Build the first visible synchronous peripheral without hiding timing errors behind a human-visible demo.",
+      "objectives": [
+        "Implement a counter with explicit reset semantics",
+        "Derive toggle period from clock frequency",
+        "Test boundary cycles rather than merely viewing output"
+      ]
+    },
+    {
+      "id": "02.02",
+      "slug": "uart-mmio",
+      "title": "UART and MMIO",
+      "section": "02",
+      "source_ref": "02.02",
+      "duration_hours": 12,
+      "path": "vault/02 Bringup/02.02 UART and MMIO.md",
+      "prerequisites": ["02.01"],
+      "language": ["SystemVerilog", "C"],
+      "lab": "lab-02-uart",
+      "artifact": "A tested UART transmit/receive state machine behind a documented MMIO register interface",
+      "summary": "Turn serial framing and a device register contract into the machine's first communication channel.",
+      "objectives": [
+        "Trace UART frames and sample bits at defined cycles",
+        "Design MMIO status and data registers with explicit side effects",
+        "Recover from framing, overrun, and back-pressure conditions"
+      ]
+    },
+    {
+      "id": "03.01",
+      "slug": "assembler-isa",
+      "title": "Assembler and ISA",
+      "section": "03",
+      "source_ref": "03.01",
+      "duration_hours": 14,
+      "path": "vault/03 Processor/03.01 Assembler and ISA.md",
+      "prerequisites": ["00.04", "00.07"],
+      "language": ["C", "Assembly"],
+      "lab": "lab-03-assembler",
+      "artifact": "An exact FTT-16 assembler/disassembler with diagnostics, golden vectors, and an encoding notebook",
+      "summary": "Make the instruction encoding and ABI executable before depending on a processor implementation.",
+      "objectives": [
+        "Encode instruction fields and signed immediates from the ISA table",
+        "Resolve labels without conflating source lines and byte addresses",
+        "Reject malformed programs with precise diagnostics"
+      ]
+    },
+    {
+      "id": "03.02",
+      "slug": "cpu-emulator",
+      "title": "CPU Emulator",
+      "section": "03",
+      "source_ref": "03.02",
+      "duration_hours": 32,
+      "path": "vault/03 Processor/03.02 CPU Emulator.md",
+      "prerequisites": ["03.01", "02.02"],
+      "language": ["C", "SystemVerilog", "Assembly"],
+      "lab": "lab-03-cpu",
+      "artifact": "A bounded FTT-16 emulator with architectural traces, execution-budget failures, and an optional differential RTL core",
+      "summary": "Implement fetch, decode, execute, memory, and control transfer in a model that makes every state change inspectable.",
+      "objectives": [
+        "State the precise architectural effect of each supported instruction",
+        "Enforce register-width, program-counter, and memory-boundary invariants",
+        "Find the first divergent state between two execution models"
+      ]
+    },
+    {
+      "id": "03.03",
+      "slug": "boot-rom-monitor",
+      "title": "Boot ROM Monitor",
+      "section": "03",
+      "source_ref": "03.03",
+      "duration_hours": 10,
+      "path": "vault/03 Processor/03.03 Boot ROM Monitor.md",
+      "prerequisites": ["03.02"],
+      "language": ["Assembly", "Python"],
+      "lab": null,
+      "artifact": "A ROM monitor that validates, loads, inspects, and jumps to a RAM image through the simulated UART",
+      "summary": "Create a small trusted boot path and a recovery interface before adding higher-level software.",
+      "objectives": [
+        "Design a byte-stream protocol that can resynchronize after bad input",
+        "Validate target ranges, lengths, and checksums before writes",
+        "Demonstrate a complete load-to-RAM-and-execute transcript"
+      ]
+    },
+    {
+      "id": "04.01",
+      "slug": "c-compiler",
+      "title": "C Compiler",
+      "section": "04",
+      "source_ref": "04.01",
+      "duration_hours": 36,
+      "path": "vault/04 Compiler/04.01 C Compiler.md",
+      "prerequisites": ["03.01", "00.07"],
+      "language": ["Python", "C", "Assembly"],
+      "lab": "lab-04-compiler",
+      "artifact": "A compiler for a documented C subset with lexer, parser, typed AST, code generator, and differential tests",
+      "summary": "Translate a deliberately bounded C subset into target assembly while making language and ABI decisions explicit.",
+      "objectives": [
+        "Separate syntax, type, and code-generation responsibilities",
+        "Lower expressions and control flow without losing evaluation rules",
+        "Test compiler behavior against source-level and machine-level oracles"
+      ]
+    },
+    {
+      "id": "04.02",
+      "slug": "elf-linker",
+      "title": "ELF Linker",
+      "section": "04",
+      "source_ref": "04.02",
+      "duration_hours": 18,
+      "path": "vault/04 Compiler/04.02 ELF Linker.md",
+      "prerequisites": ["04.01", "03.01"],
+      "language": ["Python", "Assembly"],
+      "lab": "lab-04-linker",
+      "artifact": "A static linker that lays out sections, resolves symbols, applies relocations, and emits inspectable ELF32 images",
+      "summary": "Replace raw binaries with a tested object-and-link model that supports separately compiled programs.",
+      "objectives": [
+        "Explain sections, symbols, relocations, and segments",
+        "Compute relocation values with range and overflow checks",
+        "Diagnose duplicate, missing, and incompatible definitions"
+      ]
+    },
+    {
+      "id": "04.03",
+      "slug": "freestanding-libc-allocator",
+      "title": "Freestanding libc and Allocator",
+      "section": "04",
+      "source_ref": "04.03",
+      "duration_hours": 18,
+      "path": "vault/04 Compiler/04.03 Freestanding libc and Allocator.md",
+      "prerequisites": ["04.02", "00.06"],
+      "language": ["C", "Assembly"],
+      "lab": "lab-04-allocator",
+      "artifact": "A freestanding runtime with startup, memory/string routines, bounded formatting, and an invariant-checked allocator",
+      "summary": "Supply the small runtime contracts required by larger target C programs without pretending to implement all of libc.",
+      "objectives": [
+        "Implement byte routines with overlap and boundary rules",
+        "Maintain allocator metadata invariants under split and coalesce",
+        "Separate target runtime services from host operating-system assumptions"
+      ]
+    },
+    {
+      "id": "04.04",
+      "slug": "ethernet-controller",
+      "title": "Ethernet Controller",
+      "section": "04",
+      "source_ref": "04.04",
+      "duration_hours": 12,
+      "path": "vault/04 Compiler/04.04 Ethernet Controller.md",
+      "prerequisites": ["02.02", "03.02"],
+      "language": ["SystemVerilog", "C", "Python"],
+      "lab": null,
+      "artifact": "A deterministic MMIO packet device with bounded TX/RX queues, error tests, and PCAP evidence",
+      "summary": "Preserve the Ethernet/MMIO design lesson with a software packet backend before any real PHY work.",
+      "objectives": [
+        "Define ownership transitions for transmit and receive buffers",
+        "Handle queue-full, truncation, and malformed-frame conditions",
+        "Correlate MMIO activity with captured Ethernet frames"
+      ]
+    },
+    {
+      "id": "04.05",
+      "slug": "network-bootloader",
+      "title": "Network Bootloader",
+      "section": "04",
+      "source_ref": "04.05",
+      "duration_hours": 12,
+      "path": "vault/04 Compiler/04.05 Network Bootloader.md",
+      "prerequisites": ["03.03", "04.03", "04.04"],
+      "language": ["C", "Assembly"],
+      "lab": null,
+      "artifact": "A C second-stage loader with validated image framing, checksum, bounded placement, serial fallback, and boot transcript",
+      "summary": "Use the new C runtime and packet device to load kernels without replacing the recovery path.",
+      "objectives": [
+        "Treat every image field and packet as hostile input",
+        "Validate an entire image before transferring control",
+        "Preserve a minimal serial recovery path"
+      ]
+    },
+    {
+      "id": "05.01",
+      "slug": "mmu-page-tables",
+      "title": "MMU and Page Tables",
+      "section": "05",
+      "source_ref": "05.01",
+      "duration_hours": 24,
+      "path": "vault/05 Operating System/05.01 MMU and Page Tables.md",
+      "prerequisites": ["03.02"],
+      "language": ["Python", "SystemVerilog", "C"],
+      "lab": "lab-05-pagewalk",
+      "artifact": "A reference page-table walker with permission faults, TLB invalidation, and randomized translation tests",
+      "summary": "Extend the processor with coherent privilege, translation, permissions, and fault behavior before relying on isolation.",
+      "objectives": [
+        "Trace a virtual address through page-table levels",
+        "Distinguish absent, malformed, and permission-denied mappings",
+        "Keep TLB state coherent when mappings change"
+      ]
+    },
+    {
+      "id": "05.02",
+      "slug": "unix-like-operating-system",
+      "title": "Unix-like Operating System",
+      "section": "05",
+      "source_ref": "05.02",
+      "duration_hours": 60,
+      "path": "vault/05 Operating System/05.02 Unix-like Operating System.md",
+      "prerequisites": ["04.03", "04.05", "05.01"],
+      "language": ["C", "Assembly"],
+      "lab": null,
+      "artifact": "A kernel that boots userspace, isolates processes, implements the scoped syscall set, and records deterministic traces",
+      "summary": "Build the minimum coherent kernel around traps, memory, scheduling, processes, files, and ELF execution.",
+      "objectives": [
+        "Maintain explicit invariants across traps and context switches",
+        "Validate all user pointers at the kernel boundary",
+        "Demonstrate fork, exec, wait, sleep, and protected mappings"
+      ]
+    },
+    {
+      "id": "05.03",
+      "slug": "sd-card-block-device",
+      "title": "SD Card and Block Device",
+      "section": "05",
+      "source_ref": "05.03",
+      "duration_hours": 8,
+      "path": "vault/05 Operating System/05.03 SD Card and Block Device.md",
+      "prerequisites": ["02.02", "05.02"],
+      "language": ["C", "SystemVerilog"],
+      "lab": null,
+      "artifact": "A sector device and driver backed by a disk image with timeout, bounds, and injected-I/O-failure tests",
+      "summary": "Keep the core storage lesson deterministic while isolating optional real SD signaling behind the same block API.",
+      "objectives": [
+        "Define exact sector and buffer contracts",
+        "Propagate short and failed I/O without corrupting caller state",
+        "Separate filesystem policy from device mechanics"
+      ]
+    },
+    {
+      "id": "05.04",
+      "slug": "fat-filesystem",
+      "title": "FAT Filesystem",
+      "section": "05",
+      "source_ref": "05.04",
+      "duration_hours": 14,
+      "path": "vault/05 Operating System/05.04 FAT Filesystem.md",
+      "prerequisites": ["05.03"],
+      "language": ["C", "Python"],
+      "lab": "lab-05-fat",
+      "artifact": "A bounded FAT16 reader/writer whose disk image interoperates with host filesystem tools",
+      "summary": "Parse and mutate a narrow FAT16 profile without trusting on-disk offsets, lengths, or allocation chains.",
+      "objectives": [
+        "Derive filesystem regions from checked boot-sector fields",
+        "Detect loops, invalid clusters, and truncated chains",
+        "Preserve consistency while creating, writing, and deleting files"
+      ]
+    },
+    {
+      "id": "05.05",
+      "slug": "init-shell-utilities",
+      "title": "Init Shell and Utilities",
+      "section": "05",
+      "source_ref": "05.05",
+      "duration_hours": 18,
+      "path": "vault/05 Operating System/05.05 Init Shell and Utilities.md",
+      "prerequisites": ["04.03", "05.02", "05.04"],
+      "language": ["C"],
+      "lab": null,
+      "artifact": "An init process, interactive shell, downloader, cat, ls, and rm with a replayable persistent-session transcript",
+      "summary": "Exercise process, file, terminal, and runtime contracts through the first usable target environment.",
+      "objectives": [
+        "Launch and reap programs from a long-lived init process",
+        "Parse bounded command input and report syscall failures",
+        "Demonstrate filesystem state surviving a reboot"
+      ]
+    },
+    {
+      "id": "06.01",
+      "slug": "tcp-stack",
+      "title": "TCP Stack",
+      "section": "06",
+      "source_ref": "06.01",
+      "duration_hours": 24,
+      "path": "vault/06 Browser/06.01 TCP Stack.md",
+      "prerequisites": ["04.04", "05.02"],
+      "language": ["C", "Python"],
+      "lab": null,
+      "artifact": "A deliberately scoped ARP/IPv4/TCP stack with socket calls and deterministic loss/reordering tests",
+      "summary": "Add the omitted lower network layers and enough interoperable TCP for local clients and servers.",
+      "objectives": [
+        "Trace encapsulation from Ethernet through TCP",
+        "Maintain sequence and acknowledgement invariants",
+        "Recover from bounded loss, duplicates, and reordering"
+      ]
+    },
+    {
+      "id": "06.02",
+      "slug": "telnet-server",
+      "title": "Telnet Server",
+      "section": "06",
+      "source_ref": "06.02",
+      "duration_hours": 8,
+      "path": "vault/06 Browser/06.02 Telnet Server.md",
+      "prerequisites": ["05.05", "06.01"],
+      "language": ["C"],
+      "lab": null,
+      "artifact": "A loopback-only concurrent remote shell with two-client and disconnect-cleanup evidence",
+      "summary": "Use sockets and processes together while keeping the intentionally insecure service isolated from real networks.",
+      "objectives": [
+        "Connect accepted sockets to child process I/O",
+        "Reap disconnected sessions without leaking resources",
+        "Explain why a bind shell is unsafe outside the test network"
+      ]
+    },
+    {
+      "id": "06.03",
+      "slug": "dynamic-linking",
+      "title": "Dynamic Linking",
+      "section": "06",
+      "source_ref": "06.03",
+      "duration_hours": 18,
+      "path": "vault/06 Browser/06.03 Dynamic Linking.md",
+      "prerequisites": ["04.02", "05.01", "05.05"],
+      "language": ["C", "Assembly", "Python"],
+      "lab": null,
+      "artifact": "A userspace loader that maps one shared library, resolves scoped relocations, and applies final page permissions",
+      "summary": "Explore how a userspace program can map and relocate shared code without making it a prerequisite for the browser.",
+      "objectives": [
+        "Relate PIC, GOT, PLT, symbols, and runtime relocations",
+        "Resolve or reject every imported symbol deterministically",
+        "Apply writable-then-executable protections safely"
+      ],
+      "optional": true
+    },
+    {
+      "id": "06.04",
+      "slug": "text-web-browser",
+      "title": "Text Web Browser",
+      "section": "06",
+      "source_ref": "06.04",
+      "duration_hours": 24,
+      "path": "vault/06 Browser/06.04 Text Web Browser.md",
+      "prerequisites": ["05.05", "06.01"],
+      "language": ["C", "Python"],
+      "lab": "lab-06-browser",
+      "artifact": "A static-link-capable terminal browser that safely parses local HTTP and HTML fixtures and follows links",
+      "summary": "Complete the vertical slice with bounded URL, DNS, HTTP, HTML, layout, and terminal-rendering behavior.",
+      "objectives": [
+        "Parse hostile network text with explicit limits",
+        "Separate fetching, document parsing, layout, and rendering",
+        "Navigate deterministic pages without TLS, CSS, or JavaScript"
+      ]
+    },
+    {
+      "id": "07.01",
+      "slug": "jtag-interface",
+      "title": "JTAG Interface",
+      "section": "07",
+      "source_ref": "07.01",
+      "duration_hours": 12,
+      "path": "vault/07 Physical/07.01 JTAG Interface.md",
+      "prerequisites": ["00.03", "03.02"],
+      "language": ["C", "Python"],
+      "lab": "lab-07-jtag",
+      "artifact": "A C bit-bang JTAG driver verified against a simulated TAP state machine",
+      "summary": "Learn the JTAG state machine in simulation before any USB firmware or physical target is involved.",
+      "objectives": [
+        "Drive the TAP through reset and shift states",
+        "Read an IDCODE with bit-order evidence",
+        "Separate host protocol logic from physical transport"
+      ],
+      "optional": true
+    },
+    {
+      "id": "07.02",
+      "slug": "fpga-board",
+      "title": "FPGA Board",
+      "section": "07",
+      "source_ref": "07.02",
+      "duration_hours": 60,
+      "path": "vault/07 Physical/07.02 FPGA Board.md",
+      "prerequisites": ["04.04", "05.03", "07.01"],
+      "language": ["SystemVerilog"],
+      "lab": null,
+      "artifact": "A reviewed supported-dev-board integration or, separately, a fabrication-ready design package with power-up plan",
+      "summary": "Use a supported FPGA board for the course; treat custom BGA board design and reflow as a separately supervised EE project.",
+      "objectives": [
+        "Map logical peripherals to documented board resources",
+        "Review clocks, reset, power, pin constraints, and voltage compatibility",
+        "Apply a current-limited, staged power-up and safety checklist"
+      ],
+      "optional": true
+    },
+    {
+      "id": "07.03",
+      "slug": "hardware-bringup",
+      "title": "Hardware Bringup",
+      "section": "07",
+      "source_ref": "07.03",
+      "duration_hours": 12,
+      "path": "vault/07 Physical/07.03 Hardware Bringup.md",
+      "prerequisites": ["03.03", "07.02"],
+      "language": ["SystemVerilog", "C", "Shell"],
+      "lab": null,
+      "artifact": "A reproducible bitstream and staged LED, UART, RAM, storage, and network bringup report",
+      "summary": "Carry proven simulation checkpoints onto real hardware one subsystem at a time, without weakening the software completion path.",
+      "objectives": [
+        "Build and identify a bitstream reproducibly",
+        "Separate electrical, timing, logic, and software failure hypotheses",
+        "Compare hardware observations with known simulation traces"
+      ],
+      "optional": true
+    }
+  ],
+  "exams": [
+    {
+      "id": "gate-00",
+      "title": "C and Machine Foundations Gate",
+      "path": "vault/Exams/gate-00.md",
+      "bank": "course/exams/gate-00.json",
+      "passing_percent": 80
+    },
+    {
+      "id": "gate-02",
+      "title": "Synchronous Bringup Gate",
+      "path": "vault/Exams/gate-02.md",
+      "bank": "course/exams/gate-02.json",
+      "passing_percent": 80
+    },
+    {
+      "id": "gate-03",
+      "title": "Processor and Boot Gate",
+      "path": "vault/Exams/gate-03.md",
+      "bank": "course/exams/gate-03.json",
+      "passing_percent": 80
+    },
+    {
+      "id": "gate-04",
+      "title": "Compiler and Runtime Gate",
+      "path": "vault/Exams/gate-04.md",
+      "bank": "course/exams/gate-04.json",
+      "passing_percent": 80
+    },
+    {
+      "id": "gate-05",
+      "title": "Operating System Gate",
+      "path": "vault/Exams/gate-05.md",
+      "bank": "course/exams/gate-05.json",
+      "passing_percent": 80
+    },
+    {
+      "id": "gate-06",
+      "title": "Networking and Browser Gate",
+      "path": "vault/Exams/gate-06.md",
+      "bank": "course/exams/gate-06.json",
+      "passing_percent": 80
+    },
+    {
+      "id": "gate-07",
+      "title": "Physical Bringup Gate",
+      "path": "vault/Exams/gate-07.md",
+      "bank": "course/exams/gate-07.json",
+      "passing_percent": 80
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "lab-04-compiler",
+  "module": "04.01",
+  "title": "Expression Compiler",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "multiplication-precedence",
+      "argv": ["{build}/program", "2+3*4"],
+      "expected_stdout": "PUSH 2\nPUSH 3\nPUSH 4\nMUL\nADD\nRESULT 14\n"
+    },
+    {
+      "name": "parentheses-override-precedence",
+      "argv": ["{build}/program", "(2+3)*4"],
+      "expected_stdout": "PUSH 2\nPUSH 3\nADD\nPUSH 4\nMUL\nRESULT 20\n"
+    },
+    {
+      "name": "left-associative-subtraction",
+      "argv": ["{build}/program", "12 - 5 - 2"],
+      "expected_stdout": "PUSH 12\nPUSH 5\nSUB\nPUSH 2\nSUB\nRESULT 5\n"
+    },
+    {
+      "name": "nested-expression",
+      "argv": ["{build}/program", "7*(8-3)+1"],
+      "expected_stdout": "PUSH 7\nPUSH 8\nPUSH 3\nSUB\nMUL\nPUSH 1\nADD\nRESULT 36\n"
+    },
+    {
+      "name": "reject-missing-operand",
+      "argv": ["{build}/program", "2+"],
+      "expected_stdout": "error: expected integer or '('\n",
+      "expected_exit": 2
+    },
+    {
+      "name": "reject-arithmetic-overflow",
+      "argv": ["{build}/program", "9223372036854775807+1"],
+      "expected_stdout": "error: arithmetic overflow\n",
+      "expected_exit": 2
+    },
+    {
+      "name": "negative-result-after-precedence",
+      "argv": ["{build}/program", "2-5*3"],
+      "expected_stdout": "PUSH 2\nPUSH 5\nPUSH 3\nMUL\nSUB\nRESULT -13\n"
+    },
+    {
+      "name": "maximum-literal-times-zero-does-not-overflow",
+      "argv": ["{build}/program", "9223372036854775807*0"],
+      "expected_stdout": "PUSH 9223372036854775807\nPUSH 0\nMUL\nRESULT 0\n"
+    },
+    {
+      "name": "whitespace-around-nested-expression",
+      "argv": ["{build}/program", " ( 2 + 3 ) * 4 "],
+      "expected_stdout": "PUSH 2\nPUSH 3\nADD\nPUSH 4\nMUL\nRESULT 20\n"
+    },
+    {
+      "name": "reject-adjacent-literals-without-operator",
+      "argv": ["{build}/program", "1 2"],
+      "expected_stdout": "error: unexpected trailing input\n",
+      "expected_exit": 2
+    },
+    {
+      "name": "reject-unclosed-parenthesis-without-partial-program",
+      "argv": ["{build}/program", "(1+2"],
+      "expected_stdout": "error: expected ')'\n",
+      "expected_exit": 2
+    }
+  ]
+}

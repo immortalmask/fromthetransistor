@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "gate-03",
+  "questions": [
+    {
+      "prompt": "A branch encoding is PC-relative and instruction addresses are measured in bytes. What must the assembler use for a label operand?",
+      "choices": {
+        "A": "The label's source line number",
+        "B": "The label byte address minus the branch instruction's defined PC base",
+        "C": "The absolute label address with no range check",
+        "D": "The number of labels encountered"
+      },
+      "answer": "B",
+      "explanation": "PC-relative encoding uses an address difference from the ISA-defined PC base. Source line counts do not account for instruction width, directives, or layout."
+    },
+    {
+      "prompt": "If an instruction faults before its architectural operation completes, what is the safest teaching-CPU commit rule?",
+      "choices": {
+        "A": "Commit whichever register and memory writes happened first",
+        "B": "Commit no instruction-visible writes and report the precise fault state",
+        "C": "Advance the PC twice and continue",
+        "D": "Reset all memory"
+      },
+      "answer": "B",
+      "explanation": "A precise fault leaves the instruction's architectural writes uncommitted and records where and why it failed. Partial writes make restart and differential traces ambiguous."
+    },
+    {
+      "prompt": "A differential CPU trace first differs in the destination register after an ADD instruction while PC and source registers still agree. Which component is the best first suspect?",
+      "choices": {
+        "A": "The UART receiver",
+        "B": "ADD decode or execute/writeback semantics",
+        "C": "The boot checksum only",
+        "D": "The later branch predictor"
+      },
+      "answer": "B",
+      "explanation": "The first differing architectural write occurs at ADD, so its decoded operation, arithmetic, or destination write is the narrowest causal boundary. Later failures are downstream."
+    },
+    {
+      "prompt": "Which boot-monitor validation order is safest before copying a payload?",
+      "choices": {
+        "A": "Copy, jump, then verify checksum",
+        "B": "Read declared length, allocate without limits, then check destination",
+        "C": "Validate header and arithmetic, validate destination range, receive bounded bytes, verify integrity, then permit jump",
+        "D": "Accept any address if the serial link is local"
+      },
+      "answer": "C",
+      "explanation": "Structure, arithmetic, and range must be proven before writes; completeness and integrity must be proven before control transfer. A local transport is not authorization."
+    },
+    {
+      "prompt": "Why should an emulator check instruction alignment before fetching bytes?",
+      "choices": {
+        "A": "To make disassembly prettier",
+        "B": "Because misaligned fetch behavior is part of the architecture and unchecked fetch can read the wrong or out-of-range bytes",
+        "C": "Because all data accesses are always aligned",
+        "D": "Only to improve host compiler optimization"
+      },
+      "answer": "B",
+      "explanation": "The ISA defines legal instruction alignment and fault behavior. Checking before memory access preserves precise traps and bounds."
+    }
+  ]
+}

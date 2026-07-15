@@ -1,43 +1,261 @@
-## From the Transistor to the Web Browser
+# From the Transistor to the Web Browser
 
-Hiring is hard, a lot of modern CS education is really bad, and it's hard to find people who understand the modern computer stack from first principles.
+This is a course about building enough of a computer that its abstractions stop
+feeling magical. You begin with C, bytes, and state machines; then build upward
+through logic, devices, a small processor, a toolchain, an operating-system
+model, networking, and a text browser.
 
-Now cleaned up and going to be software only. Closer to being real.
+The course is meant for someone who is curious about reverse engineering and
+low-level systems but is not yet comfortable in C. The required path runs on an
+ordinary Linux machine. An FPGA is optional.
 
-#### Section 1: Intro: Cheating our way past the transistor -- 0.5 weeks
-- So about those transistors -- Course overview. Describe how FPGAs are buildable using transistors, and that ICs are just collections of transistors in a nice reliable package. Understand the LUTs and stuff. Talk briefly about the theory of transistors, but all projects must build on each other so we can’t build one.
-- Emulation -- Building on real hardware limits the reach of this course. Using something like Verilator will allow anyone with a computer to play.
+The original Geohot outline is extremely ambitious. This repository does not
+pretend that twelve tiny exercises equal an ARM CPU, compiler, Unix, TCP stack,
+and physical board. Instead it provides two connected paths:
 
-#### Section 2: Bringup: What language is hardware coded in? -- 0.5 weeks
-- Blinking an LED(Verilog, 10) -- Your first little program! Getting the simulator working. Learning Verilog.
-- Building a UART(Verilog, 100) -- An intro chapter to Verilog, copy a real UART, introducing the concept of MMIO, though the serial port may be semihosting. Serial test echo program and led control.
+- **Core course:** 32 guided modules, 12 tested C labs, seven gates, five
+  cumulative notebooks, lectures, workbooks, homework, and references.
+- **Hard track:** 64 long-form systems problems involving binary archaeology,
+  fuzzing, mutation testing, independent oracles, hostile boot/storage/network
+  conditions, and cross-stage boss artifacts.
 
-#### Section 3: Processor: What is a processor anyway? -- 3 weeks
-- Coding an assembler(Python, 500) -- Straightforward and boring, write in python. Happens in parallel with the CPU building. Teaches you ARM assembly. Initially outputs just binary files, but changed when you write a linker.
-- Building a ARM7 CPU(Verilog, 1500) -- Break this into subchapters. A simple pipeline to start, decode, fetch, execute. How much BRAM do we have? We need at least 1MB, DDR would be hard I think, maybe an SRAM. Simulatable and synthesizable.
-- Coding a bootrom(Assembler, 40) -- This allows code download into RAM over the serial port, and is baked into the FPGA image. Cute test programs run on this.
+Start with the core. Use the hard track after you understand the corresponding
+stage—or when the core version feels too polite.
 
-#### Section 4: Compiler: A “high” level language -- 3 weeks
-- Building a C compiler(Haskell, 2000) -- A bit more interesting, cover the basics of compiler design. Write in haskell. Write a parser. Break this into subchapters. Outputs ARM assembly.
-- Building a linker(Python, 300) -- If you are clever, this should take a day. Output elf files. Use for testing with QEMU, semihosting.
-- libc + malloc(C, 500) -- The gateway to more complicated programs. libc is only half here, things like memcpy and memset and printf, but no syscall wrappers.
-- Building an ethernet controller(Verilog, 200) -- Talk to a real PHY, consider carefully MMIO design.
-- Writing a bootloader(C, 300) -- Write ethernet program to boot kernel over UDP. First thing written in C. Maybe don’t redownload over serial each time and embed in FPGA image.
+## What you need
 
-#### Section 5: Operating System: Software we take for granted -- 3 weeks
-- Building an MMU(Verilog, 1000) -- ARM9ish, explain TLBs and other fun things. Maybe also a memory controller, depending on how the FPGA is, then add the init code to your bootloader.
-- Building an operating system(C, 2500) -- UNIXish, only user space threads. (open, read, write, close), (fork, execve, wait, sleep, exit), (mmap, munmap, mprotect). Consider the debug interface you are using, ranging from printf to perhaps a gdbremote stub into kernel. Break into subchapters.
-- Talking to an SD card(Verilog, 150) -- The last hardware you have to do. And a driver
-- FAT(C, 300) -- A real filesystem, I think fat is the simplest
-- init, shell, download, cat, ls, rm(C, 250) -- Your first user space programs.
+- Python 3.11 or newer
+- a C17 compiler available as `cc` (Clang or GCC)
+- GNU Make
+- Git, recommended for checkpointing your work
 
-#### Section 6: Browser: Coming online -- 1 week
-- Building a TCP stack(C, 500) -- Probably coded in the kernel, integrate the ethernet driver into the kernel. Add support for networking syscalls to kernel. (send, recv, bind, connect)
-- telnetd, the power of being multiprocess(C, 50) --  Written in C, user can connect multiple times with telnet. Really just a bind shell.
-- Space saving dynamic linking(C, 300) -- Because we can, explain how dynamic linker is just a user space program. Changes to linker required.
-- So about that web(C, 500+) -- A “nice” text based web browser, using ANSI and terminal niceness. Dynamically linked and nice, nice as you want.
+No Python packages are required for the core runner. Jupyter is optional if you
+want to open the notebooks interactively; their automated checks use only the
+standard library.
 
-#### Section 7: Physical: Running on real hardware -- 1 week
-- Talking to an FPGA(C, 200) -- A little code for the USB MCU to bitbang JTAG.
-- Building an FPGA board -- Board design, FPGA BGA reflow, FPGA flash, a 50mhz clock, a USB JTAG port and flasher(no special hardware, a little cypress usb mcu to do jtag), a few leds, a reset button, a serial port(USB-FTDI) also powering via USB, an sd card, expansion connector(ide cable?), and an ethernet port. Optional, expansion board, host USB port, NTSC TV out, an ISA port, and PS/2 connector on the board to taunt you. We provide a toaster oven and a multimeter thermometer to do reflow. 
-- Bringup -- Compiling and downloading the Verilog for the board
+## Your first session
+
+From the repository root:
+
+```sh
+python3 ftt doctor
+python3 ftt validate
+python3 ftt list
+python3 ftt show 00.01
+```
+
+`doctor` checks the course and your local tools. `show 00.01` prints the first
+lesson. You can also open [`vault/Home.md`](vault/Home.md), or open the entire
+[`vault/`](vault/) directory as an Obsidian vault. No Obsidian plugins are
+required.
+
+Do modules `00.01` through `00.03` before the first automated C lab. They cover
+the build/debug loop and the C behavior that later looks deceptively like a CPU
+or kernel bug.
+
+When you reach `00.04`, start a real learner workspace:
+
+```sh
+python3 ftt start 00.04
+cd work/lab-00-bytes
+make test
+```
+
+The first test run is expected to fail: the starter compiles, but it is not the
+solution. Read `LAB.md` and `WORKBOOK.md`, make predictions, then edit `main.c`.
+Stay in the short loop:
+
+```sh
+make test
+```
+
+When the native C tests pass, return to the repository and run the course-level
+checker:
+
+```sh
+cd ../..
+python3 ftt check 00.04
+python3 ftt progress
+python3 ftt next
+```
+
+The course pages are source material; your code lives under ignored `work/`, and
+your progress lives under ignored `.ftt/`. You can experiment without dirtying
+the authored course.
+
+## The normal work loop
+
+At the start of a study session:
+
+```sh
+git status --short
+python3 ftt next
+python3 ftt show MODULE_ID
+```
+
+Then:
+
+1. Read the exit criteria before coding.
+2. Predict the bytes, state, trace, or failure you expect.
+3. For a lab module, run `python3 ftt start MODULE_ID`, then work inside the
+   generated directory with `make test`.
+4. Run `python3 ftt check MODULE_ID` when the local loop passes.
+5. Keep one meaningful failing trace, the repaired trace, and a short statement
+   of the invariant that makes the repair correct.
+
+Some modules intentionally have no bounded lab because their real assignment is
+larger than one command-line program. Record those only after producing an
+inspectable artifact:
+
+```sh
+python3 ftt complete 03.03 \
+  --evidence "work/boot-monitor; make test; all truncation offsets rejected"
+```
+
+“Read the page” and “seems to work” are not completion evidence.
+
+## What you build
+
+| Stage | Result |
+|---|---|
+| 00 — C Runway | C debugging habits, explicit byte layouts, ownership, ABI inspection, and state machines |
+| 01 — Logic | LUTs, registers, deterministic clocks, assertions, and waveform reasoning |
+| 02 — Bringup | LED timing, UART framing, FIFO behavior, and an MMIO boundary |
+| 03 — Processor | A fixed ISA, assembler, CPU model, trace contract, and boot monitor |
+| 04 — Toolchain | A C subset, relocation/linking, allocator/runtime, packet device, and checked boot image |
+| 05 — Operating System | Page translation, processes/syscalls, block faults, FAT, and small userland |
+| 06 — Browser | Scoped TCP exercises, concurrent sessions, loading concepts, HTTP/HTML, and terminal rendering |
+| 07 — Physical | JTAG, board review, fault isolation, and simulation-first bringup; live hardware remains optional |
+
+The scaffolded core is roughly 404 hours. For a learner who is also learning C,
+12–15 focused hours per week means about 36 weeks. Treat the historical
+twelve-week estimate as a statement of intensity, not a sensible deadline.
+
+## Workbooks, references, notebooks, and exams
+
+Every module contains a compact lecture, prediction workbook, problem set,
+cumulative homework, reverse-engineering lens, task-specific English sources,
+and observable exit criteria.
+
+- [`vault/Reference Shelf.md`](vault/Reference%20Shelf.md) collects the external
+  manuals, specifications, courses, and deeper readings. Use the source attached
+  to the current task; do not try to read the shelf front to back.
+- [`vault/Notebook Guide.md`](vault/Notebook%20Guide.md) connects five executable
+  analyses from byte contracts through CPU/toolchain/system integration and
+  simulation-first bringup.
+- `python3 ftt exam list` shows the seven gates. Each gate combines objective
+  questions with a practical investigation; the quiz score alone is not enough.
+
+## The hard track
+
+Open [`vault/Challenge Atlas.md`](vault/Challenge%20Atlas.md) after completing a
+stage gate. It contains eight problems per stage—seven independent lanes and one
+boss—for 64 problems and about 2,024 base hours in total.
+
+The stars make each stage a ladder rather than a flat wall:
+
+- `*` — focused hard problem; start here after the stage gate;
+- `**` — cumulative or adversarial work involving several contracts or an
+  independent oracle;
+- `***` — the stage boss, which integrates the block and produces its handoff.
+
+A one-star challenge is still hard. The marker describes scope and dependency,
+not an absolute promise about how many evenings it will take.
+
+```sh
+python3 ftt challenge list --stage 03
+python3 ftt challenge show H03.01
+python3 ftt challenge start H03.01
+python3 ftt challenge check H03.01
+```
+
+A challenge workspace asks for real evidence: at least two independently stored
+hashed artifacts, positive and negative replay commands, every acceptance
+criterion mapped to evidence, the first divergence, an invariant, and known
+limitations. Replay is resource-bounded but is **not a security sandbox**; run
+only code you trust.
+
+The checker refuses to record an out-of-order completion unless you explicitly
+pass `--waive-prerequisites`. If a recorded evidence packet later changes or
+disappears, challenge progress marks it stale with `[!]`.
+
+The hard track is a rigorous project specification and validation protocol. It
+is not 64 pre-solved labs. That distinction, the measured baseline, and the
+comparison with the historical repository are documented in
+[`Depth Audit and Geohot Alignment`](vault/Appendices/Depth%20Audit%20and%20Geohot%20Alignment.md).
+
+## Useful commands
+
+```text
+python3 ftt doctor                     check authored content and local tools
+python3 ftt list [--section 03]        list the core path
+python3 ftt show 03.02                 print a module page
+python3 ftt next                       show the next unlocked core module
+python3 ftt start 03.02                create a learner lab workspace
+python3 ftt check 03.02                compile, test, and record a passing lab
+python3 ftt check --all-solutions      test every reference implementation
+python3 ftt complete ID --evidence ... record a non-lab artifact
+python3 ftt progress [--json]          show core and hard-track evidence
+python3 ftt exam list                  list the assessment gates
+python3 ftt validate                   validate the authored course
+python3 ftt challenge list             list all hard problems
+python3 ftt challenge show H05.07      print one hard problem
+python3 ftt challenge start H05.07     create its evidence workspace
+python3 ftt challenge check H05.07     verify and replay its evidence packet
+```
+
+Set `FTT_WORK_DIR` to move learner work, `FTT_STATE_DIR` to move progress, or
+`CC` to select a compiler.
+
+## When something goes wrong
+
+- Run `python3 ftt doctor` when the checkout or toolchain seems wrong.
+- Run the smallest local `make test` before the whole course checker.
+- Find the first wrong byte, cycle, instruction, syscall, sector, or packet;
+  later symptoms are usually noise.
+- If a lab workspace becomes disposable, create a new destination rather than
+  editing the checked-in starter or solution.
+- The network exercises use fixtures or loopback. Never expose the teaching
+  telnet service publicly.
+- Physical work is optional. Do not connect unknown voltages, write unknown
+  flash, or power an unreviewed board merely to satisfy a course checkbox.
+
+## Repository map
+
+```text
+course/      catalogs, exams, references, and challenge specifications
+labs/        12 C labs; each has starter, solution, lab.json, and tests/test.c
+src/ftt/     course runner, validation, progress, and evidence machinery
+tests/       tests for the runner and authored course
+tools/       synchronization, notebook, sanitizer, and content checks
+vault/       the Obsidian-ready lectures, workbooks, maps, and notebooks
+work/        your generated learner work; ignored by Git
+.ftt/        your local progress/evidence index; ignored by Git
+```
+
+## Course development
+
+The repository should be releasable with one command:
+
+```sh
+make verify
+```
+
+That validates authored links and data, executes 50 Python tests, checks all 12
+reference solutions, runs 119 co-located native C cases, executes the five
+cumulative notebooks, and rebuilds/runs the C solutions with undefined-behavior
+instrumentation.
+
+For one lab's native suite:
+
+```sh
+make -C labs/lab-00-bytes test
+make -C labs/lab-00-bytes test \
+  SOURCE="$PWD/work/lab-00-bytes/main.c"
+```
+
+Authoring rules live in [`course/AUTHORING.md`](course/AUTHORING.md). The
+historical mapping and deliberate adaptations are in
+[`vault/Appendices/Original Syllabus.md`](vault/Appendices/Original%20Syllabus.md),
+[`vault/Appendices/Scope Decisions.md`](vault/Appendices/Scope%20Decisions.md),
+and [`vault/Appendices/realhw Branch Study.md`](vault/Appendices/realhw%20Branch%20Study.md).

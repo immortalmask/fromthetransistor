@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "id": "lab-02-uart",
+  "module": "02.02",
+  "title": "UART Framing and Status",
+  "build": {
+    "argv": ["{cc}", "-std=c17", "-O2", "-Wall", "-Wextra", "-Werror", "-Wpedantic", "-Wconversion", "-Wsign-conversion", "-Wshadow", "{work}/main.c", "-o", "{build}/program"],
+    "timeout": 20
+  },
+  "tests": [
+    {
+      "name": "encode-ascii-a",
+      "argv": ["{build}/program", "encode", "41"],
+      "stdin": "",
+      "expected_stdout": "frame=0100000101\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "encode-all-ones",
+      "argv": ["{build}/program", "encode", "ff"],
+      "stdin": "",
+      "expected_stdout": "frame=0111111111\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "decode-printable-byte",
+      "argv": ["{build}/program", "decode", "0011111101"],
+      "stdin": "",
+      "expected_stdout": "byte=0x7e ascii=~\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "echo-exposes-status",
+      "argv": ["{build}/program", "echo", "0100000101"],
+      "stdin": "",
+      "expected_stdout": "rx=0x41 status=RX_READY|TX_READY tx=0100000101\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-bad-stop-bit",
+      "argv": ["{build}/program", "decode", "0100000100"],
+      "stdin": "",
+      "expected_stdout": "error: stop bit must be 1\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "encode-zero-preserves-start-data-stop-boundaries",
+      "argv": ["{build}/program", "encode", "00"],
+      "stdin": "",
+      "expected_stdout": "frame=0000000001\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "decode-nonprintable-byte",
+      "argv": ["{build}/program", "decode", "0000000001"],
+      "stdin": "",
+      "expected_stdout": "byte=0x00 ascii=.\n",
+      "expected_exit": 0,
+      "timeout": 3
+    },
+    {
+      "name": "reject-bad-start-bit-before-consuming-data",
+      "argv": ["{build}/program", "decode", "1100000101"],
+      "stdin": "",
+      "expected_stdout": "error: start bit must be 0\n",
+      "expected_exit": 2,
+      "timeout": 3
+    },
+    {
+      "name": "reject-nonbinary-frame-without-partial-echo",
+      "argv": ["{build}/program", "echo", "01000x0101"],
+      "stdin": "",
+      "expected_stdout": "error: frame must contain exactly ten binary digits\n",
+      "expected_exit": 2,
+      "timeout": 3
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "gate-04",
+  "questions": [
+    {
+      "prompt": "Which compiler stage should reject a use of an undeclared identifier after syntax has parsed successfully?",
+      "choices": {
+        "A": "Lexing",
+        "B": "Name resolution or semantic analysis",
+        "C": "Final image checksum",
+        "D": "Heap coalescing"
+      },
+      "answer": "B",
+      "explanation": "The parser can recognize the identifier-shaped expression, but scoped name resolution determines whether it denotes a declaration. Keeping stages distinct improves diagnostics."
+    },
+    {
+      "prompt": "For a simple PC-relative relocation, which expression is commonly represented by S + A - P?",
+      "choices": {
+        "A": "Symbol address plus addend minus relocation-place address",
+        "B": "Section size plus alignment minus file size",
+        "C": "Stack pointer plus argument count minus page size",
+        "D": "Checksum minus packet length"
+      },
+      "answer": "A",
+      "explanation": "S is the resolved symbol, A the encoded/additional addend, and P the address of the relocation place. The result still requires width and range checking."
+    },
+    {
+      "prompt": "Why can a forward-only byte loop implement memcpy but not general memmove?",
+      "choices": {
+        "A": "memmove always reverses every copy",
+        "B": "Overlapping destination at a higher address can overwrite source bytes before they are read",
+        "C": "memcpy performs integer arithmetic only",
+        "D": "memmove cannot copy zero bytes"
+      },
+      "answer": "B",
+      "explanation": "When ranges overlap and destination starts inside the source at a higher address, copying backward preserves unread source bytes. Direction depends on the range relationship."
+    },
+    {
+      "prompt": "In a transmit descriptor ring, when may software safely reuse a descriptor buffer?",
+      "choices": {
+        "A": "Immediately after writing the descriptor",
+        "B": "Only after the controller has explicitly returned ownership or completion",
+        "C": "Whenever producer and consumer indexes differ",
+        "D": "After an arbitrary delay"
+      },
+      "answer": "B",
+      "explanation": "Ownership, not elapsed time, establishes whether the controller may still read the buffer. Reuse before completion creates data races and frame corruption."
+    },
+    {
+      "prompt": "Which property is not provided by an ordinary non-cryptographic boot image checksum?",
+      "choices": {
+        "A": "Detection of many accidental bit errors",
+        "B": "Evidence that all expected bytes arrived when length is also checked",
+        "C": "Authentication that the image came from an authorized producer",
+        "D": "A deterministic integrity comparison"
+      },
+      "answer": "C",
+      "explanation": "An attacker can replace both image and ordinary checksum. Authentication requires a keyed MAC or signature plus key and rollback policy."
+    }
+  ]
+}
