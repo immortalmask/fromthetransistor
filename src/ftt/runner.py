@@ -82,9 +82,9 @@ def validate_lab_spec(spec: Any, expected_id: str | None = None) -> dict[str, An
 
     if not isinstance(spec, dict) or spec.get("schema_version") != 1:
         raise CourseError("lab specification must be a schema-version 1 object")
-    for field in ("id", "module", "title"):
-        if not isinstance(spec.get(field), str) or not spec[field].strip():
-            raise CourseError(f"lab specification needs a non-empty {field}")
+    for field_name in ("id", "module", "title"):
+        if not isinstance(spec.get(field_name), str) or not spec[field_name].strip():
+            raise CourseError(f"lab specification needs a non-empty {field_name}")
     if expected_id is not None and spec["id"] != expected_id:
         raise CourseError(
             f"Lab id mismatch: expected {expected_id!r}, found {spec['id']!r}"
@@ -125,10 +125,10 @@ def validate_lab_spec(spec: Any, expected_id: str | None = None) -> dict[str, An
         expected_exit = case.get("expected_exit", 0)
         if isinstance(expected_exit, bool) or not isinstance(expected_exit, int):
             raise CourseError(f"{context}: expected_exit must be an integer")
-        for field in ("stdin", "expected_stdout"):
-            value = case.get(field, "")
+        for field_name in ("stdin", "expected_stdout"):
+            value = case.get(field_name, "")
             if not isinstance(value, str):
-                raise CourseError(f"{context}: {field} must be a string")
+                raise CourseError(f"{context}: {field_name} must be a string")
         if len(case.get("stdin", "").encode("utf-8")) > MAX_STDIN_BYTES:
             raise CourseError(
                 f"{context}: stdin exceeds the {MAX_STDIN_BYTES}-byte fixture limit"

@@ -1,5 +1,9 @@
 # From the Transistor to the Web Browser
 
+![From the Transistor to the Web Browser](main.jpeg)
+
+[![Build and test](https://github.com/immortalmask/fromthetransistor/actions/workflows/verify.yml/badge.svg?branch=master)](https://github.com/immortalmask/fromthetransistor/actions/workflows/verify.yml) [![Lint and consistency](https://github.com/immortalmask/fromthetransistor/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/immortalmask/fromthetransistor/actions/workflows/lint.yml)
+
 This is a course about building enough of a computer that its abstractions stop
 feeling magical. You begin with C, bytes, and state machines; then build upward
 through logic, devices, a small processor, a toolchain, an operating-system

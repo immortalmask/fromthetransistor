@@ -227,7 +227,6 @@ def desired_pages(
 
 
 def render_shelf(catalog: dict[str, Any], references: dict[str, Any]) -> str:
-    modules = {module["id"]: module for module in catalog["modules"]}
     lines = [
         "---",
         'title: "Reference Shelf"',
